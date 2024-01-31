@@ -18,7 +18,8 @@
   "scripts": {
     "build": "pnpm run -r build",
     "clean": "pnpm run -r clean",
-    "tests": "pnpm run -r tests"
+    "tests": "pnpm run -r tests",
+    "watch": "pnpm run -r --parallel watch"
   },
   "devDependencies": {
     "@types/node": "20.x",

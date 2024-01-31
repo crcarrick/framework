@@ -1,0 +1,22 @@
+{
+  "name": "@framework/example",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Example site built with framework",
+  "author": {
+    "name": "Chris Carrick",
+    "email": "chris@crccarrick.dev"
+  },
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "scripts": {
+    "start": "framework start"
+  },
+  "dependencies": {
+    "@framework/scripts": "link:../packages/scripts",
+    "express": "^4.18.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}

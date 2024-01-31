@@ -1,12 +1,14 @@
 {
-  "name": "@framework/router",
+  "name": "@framework/scripts",
   "version": "0.0.1",
-  "description": "File-based routing package",
+  "description": "A collection of scripts for @framework",
   "author": {
     "name": "Chris Carrick",
     "email": "chris@crcarrick.dev"
   },
-  "main": "dist/index",
+  "bin": {
+    "framework": "dist/index.js"
+  },
   "types": "src/index",
   "files": [
     "dist"
@@ -19,10 +21,9 @@
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
-    "@framework/utils": "workspace:*"
+    "@framework/server": "workspace:*"
   },
   "devDependencies": {
-    "@types/react": "^18.2.48",
     "typescript": "^5.3.3"
   }
 }

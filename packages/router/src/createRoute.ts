@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-interface Component<T extends object> {
+export interface Component<T extends object> {
   (props: T): ReactNode
 }
 

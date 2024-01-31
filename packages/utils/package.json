@@ -1,7 +1,7 @@
 {
-  "name": "@framework/router",
+  "name": "@framework/utils",
   "version": "0.0.1",
-  "description": "File-based routing package",
+  "description": "A collection of utilities for @framework",
   "author": {
     "name": "Chris Carrick",
     "email": "chris@crcarrick.dev"
@@ -18,11 +18,7 @@
     "watch": "pnpm clean && tsc -p tsconfig.build.json --watch",
     "prepublishOnly": "pnpm build"
   },
-  "dependencies": {
-    "@framework/utils": "workspace:*"
-  },
   "devDependencies": {
-    "@types/react": "^18.2.48",
     "typescript": "^5.3.3"
   }
 }
