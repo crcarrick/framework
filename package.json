@@ -1,0 +1,30 @@
+{
+  "name": "framework",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Building my own React framework (for fun)",
+  "repository": "https://github.com/crcarrick/framework.git",
+  "author": {
+    "name": "Chris Carrick",
+    "email": "chris@crccarrick.dev"
+  },
+  "engines": {
+    "node": ">=20.11.0",
+    "pnpm": ">=8.15.0"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "pnpm run -r build",
+    "clean": "pnpm run -r clean",
+    "tests": "pnpm run -r tests"
+  },
+  "devDependencies": {
+    "@types/node": "20.x",
+    "@typescript-eslint/eslint-plugin": "^6.20.0",
+    "@typescript-eslint/parser": "^6.20.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.4"
+  }
+}

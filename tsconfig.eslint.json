@@ -1,0 +1,6 @@
+{
+  "include": ["./packages/**/*.ts{,x}"],
+  "compilerOptions": {
+    "noEmit": true
+  }
+}
