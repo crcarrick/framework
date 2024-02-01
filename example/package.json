@@ -16,7 +16,7 @@
     "dev": "framework dev"
   },
   "dependencies": {
-    "@framework/scripts": "link:../packages/scripts",
+    "@framework/scripts": "workspace:*",
     "express": "^4.18.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

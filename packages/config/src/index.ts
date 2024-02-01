@@ -1,6 +1,6 @@
 import { parse } from 'node:path'
+import { createRequire } from 'node:module'
 
-import { dynamicImport } from '@framework/utils'
 import { findUp } from 'find-up'
 
 export interface Config {
@@ -34,16 +34,22 @@ export async function findConfig(): Promise<string> {
   return root
 }
 
-export async function loadConfig(root: string): Promise<Config> {
-  const parsed = parse(root)
-  const config = await dynamicImport(parsed)
+const require = createRequire(import.meta.url)
 
-  if (parsed.ext === '.json' && isConfig(config)) {
-    return config
+export async function loadConfig(root: string): Promise<Config> {
+  if (require.cache[root]) {
+    delete require.cache[root]
   }
 
-  if (parsed.ext.match(/\.m?c?js$/) && isJsConfig(config)) {
-    return typeof config === 'function' ? config() : config
+  const parsed = parse(root)
+  const config = require(root) as Config | (() => Config)
+
+  if (parsed.ext === '.json' && isConfig(config)) {
+    return Promise.resolve(config)
+  }
+
+  if (parsed.ext.match(/\.c?js$/) && isJsConfig(config)) {
+    return Promise.resolve(typeof config === 'function' ? config() : config)
   }
 
   throw new Error('Invalid framework config')

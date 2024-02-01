@@ -8,7 +8,14 @@ import { runServer } from '@framework/server'
 import chokidar from 'chokidar'
 
 function close(server: Server) {
-  return new Promise((resolve) => server.close(resolve))
+  return new Promise<void>((resolve, reject) =>
+    server.close((err) => {
+      if (err) {
+        return reject(err)
+      }
+      resolve()
+    }),
+  )
 }
 
 async function watch() {
@@ -30,7 +37,7 @@ async function watch() {
   })
 }
 
-async function watchServer() {
+async function* watchServer() {
   let watching = true
 
   process.on('SIGINT', () => {
@@ -38,9 +45,7 @@ async function watchServer() {
   })
 
   while (watching) {
-    const server = await runServer()
-    await watch()
-    await close(server)
+    yield await watch()
   }
 }
 
@@ -56,7 +61,12 @@ async function main() {
 
   switch (command) {
     case 'dev': {
-      return await watchServer()
+      let server = await runServer()
+      for await (const _ of watchServer()) {
+        await close(server)
+        server = await runServer()
+      }
+      break
     }
 
     case 'start': {

@@ -7,16 +7,16 @@
     "email": "chris@crcarrick.dev"
   },
   "bin": {
-    "framework": "dist/index.js"
+    "framework": "bin/index.js"
   },
   "types": "src/index.ts",
   "files": [
-    "dist"
+    "bin"
   ],
   "type": "module",
   "scripts": {
     "build": "pnpm clean && tsc -p tsconfig.build.json",
-    "clean": "rimraf ./dist && rimraf tsconfig.build.tsbuildinfo",
+    "clean": "rimraf ./bin && rimraf tsconfig.build.tsbuildinfo",
     "tests": "",
     "watch": "pnpm clean && tsc -p tsconfig.build.json --watch",
     "prepublishOnly": "pnpm build"

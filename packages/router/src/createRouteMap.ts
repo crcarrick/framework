@@ -1,7 +1,6 @@
+import { createRequire } from 'node:module'
 import { readdir, stat } from 'node:fs/promises'
 import { join, parse } from 'node:path'
-
-import { dynamicImport } from '@framework/utils'
 
 import type { Component } from './createRoute.js'
 
@@ -10,6 +9,8 @@ type RouteMap = Map<string, Component<object>>
 export interface CreateRouteMap {
   (dir: string, base?: string, routes?: RouteMap): Promise<RouteMap>
 }
+
+const require = createRequire(import.meta.url)
 
 export const createRouteMap = async function createRouteMap(
   dir,
@@ -24,8 +25,20 @@ export const createRouteMap = async function createRouteMap(
     if ((await stat(fullPath)).isDirectory()) {
       await createRouteMap(fullPath, route, routes)
     } else {
-      const module = (await dynamicImport(fullPath)) as Component<object>
-      routes.set(parse(route).dir, module)
+      try {
+        if (require.cache[fullPath]) {
+          delete require.cache[fullPath]
+        }
+        const module = require(fullPath) as Component<object>
+        routes.set(parse(route).dir, module)
+      } catch {
+        const module = (
+          (await import(`${fullPath}?invalidate=${Date.now()}`)) as {
+            default: Component<object>
+          }
+        ).default
+        routes.set(parse(route).dir, module)
+      }
     }
   }
 
