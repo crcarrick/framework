@@ -16,6 +16,7 @@
     "dev": "framework dev"
   },
   "dependencies": {
+    "@framework/router": "workspace:^",
     "@framework/scripts": "workspace:*",
     "express": "^4.18.2",
     "react": "^18.2.0",
