@@ -42,7 +42,7 @@ export async function loadConfig(root: string): Promise<Config> {
     return config
   }
 
-  if (parsed.ext.endsWith('js') && isJsConfig(config)) {
+  if (parsed.ext.match(/\.m?c?js$/) && isJsConfig(config)) {
     return typeof config === 'function' ? config() : config
   }
 
