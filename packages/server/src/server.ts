@@ -1,6 +1,8 @@
 import { join, parse } from 'node:path'
+import { createServer } from 'node:http'
 
 import express from 'express'
+import compression from 'compression'
 
 import { findConfig, loadConfig } from '@framework/config'
 import { createRouteMap } from '@framework/router'
@@ -12,22 +14,30 @@ export async function runServer() {
 
   const root = await findConfig()
   const config = await loadConfig(root)
-  // TODO: ensure pages directory exists
   const routeMap = await createRouteMap(join(parse(root).dir, 'pages'))
 
-  console.log(routeMap)
-
+  app.use(compression())
+  app.use(express.static(join(import.meta.dirname, '..', 'public')))
   app.use((req, res) => {
     const Component = routeMap.get(req.path)
     if (!Component || typeof Component !== 'function') {
       return res.status(404).send('Not found')
     }
 
-    return renderToPipeableStream(createElement(Component, {})).pipe(res)
+    const { pipe } = renderToPipeableStream(createElement(Component, {}), {
+      // bootstrapModules: ['/main.mjs'],
+      onShellReady() {
+        res.setHeader('content-type', 'text/html')
+        pipe(res)
+      },
+    })
   })
 
   const port = config.port || 3000
-  app.listen(port, () =>
+  const server = createServer(app)
+  server.listen(port, () =>
     console.log(`🚀 Server is running on http://localhost:${port}`),
   )
+
+  return server
 }

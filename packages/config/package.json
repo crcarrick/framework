@@ -6,14 +6,15 @@
     "name": "Chris Carrick",
     "email": "chris@crcarrick.dev"
   },
-  "main": "dist/index",
-  "types": "src/index",
+  "main": "dist/index.js",
+  "types": "src/index.ts",
   "files": [
     "dist"
   ],
+  "type": "module",
   "scripts": {
     "build": "pnpm clean && tsc -p tsconfig.build.json",
-    "clean": "rm -rf ./dist && rm -rf tsconfig.build.tsbuildinfo",
+    "clean": "rimraf ./dist && rimraf tsconfig.build.tsbuildinfo",
     "tests": "",
     "watch": "pnpm clean && tsc -p tsconfig.build.json --watch",
     "prepublishOnly": "pnpm build"
@@ -22,6 +23,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@framework/utils": "workspace:*"
+    "@framework/utils": "workspace:*",
+    "find-up": "^7.0.0"
   }
 }

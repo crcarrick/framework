@@ -1,9 +1,12 @@
 {
   "compilerOptions": {
     "esModuleInterop": true,
+    "jsx": "react-jsx",
     "lib": ["es2022"],
-    "module": "commonjs",
-    "target": "es2022",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "target": "esnext",
+    "skipLibCheck": true,
     "sourceMap": true,
     "strict": true
   },

@@ -34,22 +34,3 @@ export async function exists(path: string) {
     return false
   }
 }
-
-export async function findUp(name: string | string[], start = process.cwd()) {
-  const names = [name].flat()
-  const curr = parse(start)
-
-  if (curr.dir === curr.root) {
-    return null
-  }
-
-  for (const name of names) {
-    const file = join(start, name)
-
-    if (await exists(file)) {
-      return file
-    }
-  }
-
-  return findUp(names, curr.dir)
-}

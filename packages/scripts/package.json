@@ -9,19 +9,21 @@
   "bin": {
     "framework": "dist/index.js"
   },
-  "types": "src/index",
+  "types": "src/index.ts",
   "files": [
     "dist"
   ],
+  "type": "module",
   "scripts": {
     "build": "pnpm clean && tsc -p tsconfig.build.json",
-    "clean": "rm -rf ./dist && rm -rf tsconfig.build.tsbuildinfo",
+    "clean": "rimraf ./dist && rimraf tsconfig.build.tsbuildinfo",
     "tests": "",
     "watch": "pnpm clean && tsc -p tsconfig.build.json --watch",
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
-    "@framework/server": "workspace:*"
+    "@framework/server": "workspace:*",
+    "chokidar": "^3.5.3"
   },
   "devDependencies": {
     "typescript": "^5.3.3"

@@ -2,9 +2,10 @@
   "extends": "./tsconfig.build.json",
   "compilerOptions": {
     "baseUrl": ".",
+    "jsx": "react-jsx",
     "noEmit": true,
     "paths": {
-      "@framework/*": ["*/src"]
-    }
-  }
+      "@framework/*": ["*/src"],
+    },
+  },
 }

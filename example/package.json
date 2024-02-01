@@ -10,8 +10,10 @@
   "engines": {
     "node": ">=20.11.0"
   },
+  "type": "module",
   "scripts": {
-    "start": "framework start"
+    "start": "framework start",
+    "dev": "framework dev"
   },
   "dependencies": {
     "@framework/scripts": "link:../packages/scripts",

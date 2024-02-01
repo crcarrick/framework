@@ -1,6 +1,7 @@
 import { parse } from 'node:path'
 
-import { dynamicImport, findUp } from '@framework/utils'
+import { dynamicImport } from '@framework/utils'
+import { findUp } from 'find-up'
 
 export interface Config {
   port: number
@@ -19,7 +20,12 @@ function isJsConfig(obj: unknown): obj is Config | (() => Config) {
 }
 
 export async function findConfig(): Promise<string> {
-  const root = await findUp(['framework.config.js', 'framework.config.json'])
+  const root = await findUp([
+    'framework.config.js',
+    'framework.config.cjs',
+    'framework.config.mjs',
+    'framework.config.json',
+  ])
 
   if (!root) {
     throw new Error('Could not find a framework config')
@@ -36,7 +42,7 @@ export async function loadConfig(root: string): Promise<Config> {
     return config
   }
 
-  if (parsed.ext === '.js' && isJsConfig(config)) {
+  if (parsed.ext.endsWith('js') && isJsConfig(config)) {
     return typeof config === 'function' ? config() : config
   }
 

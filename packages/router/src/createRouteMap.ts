@@ -3,7 +3,7 @@ import { join, parse } from 'node:path'
 
 import { dynamicImport } from '@framework/utils'
 
-import type { Component } from './createRoute'
+import type { Component } from './createRoute.js'
 
 type RouteMap = Map<string, Component<object>>
 
