@@ -6,8 +6,9 @@ import compression from 'compression'
 
 import { findConfig, loadConfig } from '@framework/config'
 import { createRouteMap } from '@framework/router'
-import { createElement } from 'react'
 import { renderToPipeableStream } from 'react-dom/server'
+
+import { Shell } from './Shell.js'
 
 export async function runServer() {
   const app = express()
@@ -24,13 +25,18 @@ export async function runServer() {
       return res.status(404).send('Not found')
     }
 
-    const { pipe } = renderToPipeableStream(createElement(Component, {}), {
-      // bootstrapModules: ['/main.mjs'],
-      onShellReady() {
-        res.setHeader('content-type', 'text/html')
-        pipe(res)
+    const { pipe } = renderToPipeableStream(
+      <Shell>
+        <Component />
+      </Shell>,
+      {
+        // bootstrapModules: ['/main.mjs'],
+        onShellReady() {
+          res.setHeader('content-type', 'text/html')
+          pipe(res)
+        },
       },
-    })
+    )
   })
 
   const port = config.port || 3000
