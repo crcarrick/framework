@@ -21,7 +21,8 @@
     "clean": "pnpm run -r clean",
     "tests": "pnpm run -r tests",
     "watch": "pnpm run -r --parallel watch",
-    "prepare": "husky"
+    "prepare": "husky",
+    "prettier": "prettier **/*.ts{,x} --write"
   },
   "devDependencies": {
     "@eslint-community/eslint-plugin-eslint-comments": "^4.1.0",
