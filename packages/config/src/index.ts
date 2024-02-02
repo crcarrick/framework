@@ -5,6 +5,12 @@ import { findUp } from 'find-up'
 
 export interface Config {
   port: number
+  routing?: 'filesystem' | 'manual'
+}
+
+const defaultConfig: Config = {
+  port: 3000,
+  routing: 'filesystem',
 }
 
 function isConfig(obj: unknown): obj is Config {
@@ -45,11 +51,18 @@ export async function loadConfig(root: string): Promise<Config> {
   const config = require(root) as Config | (() => Config)
 
   if (parsed.ext === '.json' && isConfig(config)) {
-    return Promise.resolve(config)
+    return Promise.resolve({
+      ...defaultConfig,
+      ...config,
+    })
   }
 
   if (parsed.ext.match(/\.c?js$/) && isJsConfig(config)) {
-    return Promise.resolve(typeof config === 'function' ? config() : config)
+    const resolved = typeof config === 'function' ? config() : config
+    return Promise.resolve({
+      ...defaultConfig,
+      ...resolved,
+    })
   }
 
   throw new Error('Invalid framework config')
