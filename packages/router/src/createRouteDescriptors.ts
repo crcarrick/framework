@@ -47,7 +47,5 @@ export async function createRouteDescriptors(dir: string) {
     }
   }
 
-  console.log(routes)
-
   return routes
 }

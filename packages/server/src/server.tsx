@@ -33,34 +33,38 @@ export async function runServer() {
       return res.status(404).send('Not found')
     }
 
-    try {
-      const { Page, Layout } = importPage(route, 'dev')
-      if (!Page) {
-        return res.status(404).send('Not found')
-      }
+    importPage(route, 'dev')
+      .then(({ page, layout }) => {
+        const Page = page.Component
+        const Layout = layout.Component
 
-      const { pipe } = renderToPipeableStream(
-        <Shell>
-          {Layout ? (
-            <Layout>
+        if (!Page) {
+          return res.status(404).send('Not found')
+        }
+
+        const { pipe } = renderToPipeableStream(
+          <Shell>
+            {Layout ? (
+              <Layout {...layout.serverSideProps}>
+                <Page {...page.serverSideProps} />
+              </Layout>
+            ) : (
               <Page />
-            </Layout>
-          ) : (
-            <Page />
-          )}
-        </Shell>,
-        {
-          // bootstrapModules: ['/main.mjs'],
-          onShellReady() {
-            res.setHeader('content-type', 'text/html')
-            pipe(res)
+            )}
+          </Shell>,
+          {
+            // bootstrapModules: ['/main.mjs'],
+            onShellReady() {
+              res.setHeader('content-type', 'text/html')
+              pipe(res)
+            },
           },
-        },
-      )
-    } catch (err) {
-      console.error(err)
-      res.status(500).send('Internal server error')
-    }
+        )
+      })
+      .catch((err) => {
+        console.error(err)
+        res.status(500).send('Internal server error')
+      })
   })
 
   const port = config.port || 3000

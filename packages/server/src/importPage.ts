@@ -1,17 +1,29 @@
 import { createRequire } from 'node:module'
 
-import type { ComponentType, PropsWithChildren } from 'react'
+import type { ComponentType } from 'react'
 
 import type { RouteDescriptor } from '@framework/router'
 
-interface ImportedRoute {
-  Page: ComponentType | null
-  Layout: ComponentType<PropsWithChildren> | null
+interface ImportedRouteComponent<T extends object = object> {
+  Component: ComponentType<T> | null
+  serverSideProps: T
 }
 
-interface RouteImport {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  default: ComponentType<any>
+interface ImportedRoute<
+  TPage extends object = object,
+  TLayout extends object = object,
+> {
+  page: ImportedRouteComponent<TPage>
+  layout: ImportedRouteComponent<TLayout>
+}
+
+interface GetServerSideProps<T extends object> {
+  (): Promise<T>
+}
+
+interface RouteImport<T extends object = object> {
+  default: ComponentType<T>
+  getServerSideProps?: GetServerSideProps<T>
 }
 
 const require = createRequire(import.meta.url)
@@ -22,10 +34,10 @@ function invalidate(url: string) {
   }
 }
 
-export function importPage(
+export async function importPage(
   { page, layout }: RouteDescriptor,
   mode: 'dev' | 'prod' = 'prod',
-): ImportedRoute {
+): Promise<ImportedRoute> {
   if (mode === 'dev') {
     for (const url of [page, layout].filter(
       (url): url is Exclude<typeof url, null> => Boolean(url),
@@ -34,8 +46,27 @@ export function importPage(
     }
   }
 
+  const pageModule = page ? (require(page) as RouteImport) : null
+  const layoutModule = layout ? (require(layout) as RouteImport) : null
+
+  const Page = pageModule?.default ?? null
+  const Layout = layoutModule?.default ?? null
+
+  const pageProps = pageModule?.getServerSideProps
+    ? await pageModule.getServerSideProps()
+    : {}
+  const layoutProps = layoutModule?.getServerSideProps
+    ? await layoutModule.getServerSideProps()
+    : {}
+
   return {
-    Page: page ? (require(page) as RouteImport).default : null,
-    Layout: layout ? (require(layout) as RouteImport).default : null,
+    page: {
+      Component: Page,
+      serverSideProps: pageProps,
+    },
+    layout: {
+      Component: Layout,
+      serverSideProps: layoutProps,
+    },
   }
 }
