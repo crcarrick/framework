@@ -1,7 +1,7 @@
 {
-  "name": "@framework/config",
+  "name": "@framework/dev-server",
   "version": "0.0.1",
-  "description": "Configuration package for @framework",
+  "description": "A simple dev server for @framework",
   "author": {
     "name": "Chris Carrick",
     "email": "chris@crcarrick.dev"
@@ -19,11 +19,11 @@
     "watch": "pnpm clean && tsc -p tsconfig.build.json --watch",
     "prepublishOnly": "pnpm build"
   },
+  "dependencies": {
+    "@framework/server": "workspace:^",
+    "chokidar": "^3.5.3"
+  },
   "devDependencies": {
     "typescript": "^5.3.3"
-  },
-  "dependencies": {
-    "@framework/utils": "workspace:^",
-    "find-up": "^7.0.0"
   }
 }

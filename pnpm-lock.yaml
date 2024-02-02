@@ -51,7 +51,7 @@ importers:
   packages/config:
     dependencies:
       '@framework/utils':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../utils
       find-up:
         specifier: ^7.0.0
@@ -61,10 +61,23 @@ importers:
         specifier: ^5.3.3
         version: 5.3.3
 
+  packages/dev-server:
+    dependencies:
+      '@framework/server':
+        specifier: workspace:^
+        version: link:../server
+      chokidar:
+        specifier: ^3.5.3
+        version: 3.5.3
+    devDependencies:
+      typescript:
+        specifier: ^5.3.3
+        version: 5.3.3
+
   packages/router:
     dependencies:
       '@framework/utils':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../utils
     devDependencies:
       '@types/react':
@@ -76,12 +89,12 @@ importers:
 
   packages/scripts:
     dependencies:
+      '@framework/dev-server':
+        specifier: workspace:^
+        version: link:../dev-server
       '@framework/server':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../server
-      chokidar:
-        specifier: ^3.5.3
-        version: 3.5.3
     devDependencies:
       typescript:
         specifier: ^5.3.3
@@ -105,10 +118,10 @@ importers:
         specifier: ^7.23.7
         version: 7.23.7(@babel/core@7.23.9)
       '@framework/config':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../config
       '@framework/router':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../router
       compression:
         specifier: ^1.7.4
