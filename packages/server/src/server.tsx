@@ -14,8 +14,8 @@ register({
   presets: ['@babel/preset-env', '@babel/preset-react'],
 })
 
-import { Shell } from './Shell.js'
-import { importPage } from './importPage.js'
+import { Shell } from './components/Shell.js'
+import { importPage } from './utils/importPage.js'
 
 export async function runServer() {
   const app = express()
