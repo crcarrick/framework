@@ -1,4 +1,4 @@
-import { readdirSync, type Dirent } from 'node:fs'
+import { readdirSync } from 'node:fs'
 import { readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 
@@ -15,11 +15,11 @@ interface Result {
   path: string
 }
 
-function* _walk(
+export async function* walk(
   start: string,
-  dirents: Iterable<Dirent>,
   { base = '/', match = /./, ignore = /\b\B/ }: Options = {},
-): Generator<Result> {
+): AsyncGenerator<Result> {
+  const dirents = await readdir(start, { withFileTypes: true })
   const matcher = match instanceof RegExp ? match : new RegExp(match)
   const ignorer = ignore instanceof RegExp ? ignore : new RegExp(ignore)
 
@@ -30,7 +30,7 @@ function* _walk(
 
     const path = join(base, dirent.name)
     if (dirent.isDirectory()) {
-      yield* _walk(join(start, dirent.name), dirents, {
+      yield* walk(join(start, dirent.name), {
         base: path,
         match,
         ignore,
@@ -46,20 +46,33 @@ function* _walk(
   }
 }
 
-export async function* walk(
-  start: string,
-  { base = '/', match = /./, ignore = /\b\B/ }: Options = {},
-): AsyncGenerator<Result> {
-  const dirents = await readdir(start, { withFileTypes: true })
-
-  yield* _walk(start, dirents, { base, match, ignore })
-}
-
 export function* walkSync(
   start: string,
   { base = '/', match = /./, ignore = /\b\B/ }: Options = {},
 ): Generator<Result> {
   const dirents = readdirSync(start, { withFileTypes: true })
+  const matcher = match instanceof RegExp ? match : new RegExp(match)
+  const ignorer = ignore instanceof RegExp ? ignore : new RegExp(ignore)
 
-  yield* _walk(start, dirents, { base, match, ignore })
+  for (const dirent of dirents) {
+    if (ignorer.test(dirent.name)) {
+      continue
+    }
+
+    const path = join(base, dirent.name)
+    if (dirent.isDirectory()) {
+      yield* walkSync(join(start, dirent.name), {
+        base: path,
+        match,
+        ignore,
+      })
+    } else if (matcher.test(dirent.name)) {
+      yield {
+        base: base,
+        full: join(start, dirent.name),
+        name: dirent.name,
+        path: join(base, dirent.name),
+      }
+    }
+  }
 }

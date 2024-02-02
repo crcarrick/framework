@@ -1,46 +1,46 @@
 import { createRequire } from 'node:module'
-import { readdir, stat } from 'node:fs/promises'
-import { join, parse } from 'node:path'
+
+import { walk } from '@framework/utils'
 
 import type { Component } from './createRoute.js'
 
 type RouteMap = Map<string, Component<object>>
 
 export interface CreateRouteMap {
-  (dir: string, base?: string, routes?: RouteMap): Promise<RouteMap>
+  (dir: string, mode?: 'dev' | 'prod'): Promise<RouteMap>
 }
 
 const require = createRequire(import.meta.url)
 
-export const createRouteMap = async function createRouteMap(
+export const createRouteMap: CreateRouteMap = async function createRouteMap(
   dir,
-  base = '/',
-  routes = new Map(),
+  mode = 'prod',
 ) {
-  const files = await readdir(dir)
+  const routes: RouteMap = new Map()
+  const walker = walk(dir, {
+    base: '/',
+    match: /\.(js|jsx|ts|tsx|cjs|mjs|)$/,
+    ignore: /node_modules/,
+  })
 
-  for (const file of files) {
-    const fullPath = join(dir, file)
-    const route = join(base, parse(file).name)
-    if ((await stat(fullPath)).isDirectory()) {
-      await createRouteMap(fullPath, route, routes)
-    } else {
-      try {
-        if (require.cache[fullPath]) {
-          delete require.cache[fullPath]
-        }
-        const module = require(fullPath) as Component<object>
-        routes.set(parse(route).dir, module)
-      } catch {
-        const module = (
-          (await import(`${fullPath}?invalidate=${Date.now()}`)) as {
-            default: Component<object>
-          }
-        ).default
-        routes.set(parse(route).dir, module)
+  for await (const { base, full } of walker) {
+    try {
+      if (mode === 'dev' && require.cache[full]) {
+        delete require.cache[full]
       }
+      const module = require(full) as Component<object>
+      routes.set(base, module)
+    } catch {
+      const specifier =
+        mode === 'dev' ? `${full}?invalidate=${Date.now()}` : full
+      const module = (
+        (await import(specifier)) as {
+          default: Component<object>
+        }
+      ).default
+      routes.set(base, module)
     }
   }
 
   return routes
-} satisfies CreateRouteMap
+}
