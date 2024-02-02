@@ -1,0 +1,53 @@
+import { walk } from '@framework/utils'
+
+export interface RouteDescriptor {
+  page: string | null
+  layout: string | null
+}
+
+type RouteDescriptors = Map<string, RouteDescriptor>
+
+const LAYOUT_RE = /^layout\.((c|m)?js)$/
+const PAGE_RE = /^index\.((c|m)?js)$/
+
+export async function createRouteDescriptors(dir: string) {
+  const routes: RouteDescriptors = new Map()
+  const walker = walk(dir, {
+    base: '/',
+    match: /\.(js|jsx|ts|tsx|cjs|mjs|)$/,
+    ignore: /node_modules/,
+  })
+
+  for await (const { base, full, name } of walker) {
+    if (!routes.has(base)) {
+      routes.set(base, {
+        page: null,
+        layout: null,
+      })
+    }
+
+    if (LAYOUT_RE.test(name)) {
+      const curr = routes.get(base)
+      if (curr) {
+        routes.set(base, {
+          ...curr,
+          layout: full,
+        })
+      }
+    }
+
+    if (PAGE_RE.test(name)) {
+      const curr = routes.get(base)
+      if (curr) {
+        routes.set(base, {
+          ...curr,
+          page: full,
+        })
+      }
+    }
+  }
+
+  console.log(routes)
+
+  return routes
+}

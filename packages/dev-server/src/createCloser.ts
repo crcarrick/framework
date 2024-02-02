@@ -6,7 +6,10 @@ import type { Socket } from 'node:net'
  * Node's `server.close` is not super reliable. This function creates a more reliable
  * `close` function that will close the server and all open sockets.
  */
-export function createCloser(server: HttpServer | HttpsServer) {
+export function createCloser(
+  server: HttpServer | HttpsServer,
+  graceful = true,
+) {
   let stopped = false
 
   const sockets = new Map<Socket, number>()
@@ -42,6 +45,11 @@ export function createCloser(server: HttpServer | HttpsServer) {
       setImmediate(() => {
         stopped = true
         sockets.forEach((count, socket) => count === 0 && socket.end())
+        if (!graceful) {
+          setImmediate(() => {
+            sockets.forEach((_, socket) => socket.destroy())
+          })
+        }
         server.close((err) => {
           if (err) {
             return reject(err)

@@ -20,6 +20,7 @@
     "prepublishOnly": "pnpm build"
   },
   "devDependencies": {
+    "@types/babel__register": "^7.17.3",
     "@types/compression": "^1.7.5",
     "@types/express": "^4.17.21",
     "@types/react": "^18.2.48",
@@ -27,6 +28,8 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@babel/cli": "^7.23.9",
+    "@babel/core": "^7.23.9",
     "@babel/plugin-transform-runtime": "^7.23.9",
     "@babel/plugin-transform-typescript": "^7.23.6",
     "@babel/preset-env": "^7.23.9",

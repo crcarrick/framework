@@ -1,1 +1,1 @@
-export { createRouteMap, type CreateRouteMap } from './createRouteMap.js'
+export * from './createRouteDescriptors.js'

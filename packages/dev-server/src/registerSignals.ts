@@ -8,15 +8,15 @@ const SIGNALS = [
 ]
 
 export function registerSignals(terminate: () => void) {
-  let logged = false
+  let terminating = false
 
   SIGNALS.forEach((signal) => {
     process.on(signal, () => {
-      if (!logged) {
-        logged = true
+      if (!terminating) {
+        terminating = true
         console.log(`\nReceived ${signal}. Shutting down server...\n`)
+        terminate()
       }
-      terminate()
     })
   })
 }

@@ -1,42 +1,66 @@
 import { createServer } from 'node:http'
 import { join, parse } from 'node:path'
 
+import register from '@babel/register'
 import compression from 'compression'
 import express from 'express'
 import { renderToPipeableStream } from 'react-dom/server'
 
 import { findConfig, loadConfig } from '@framework/config'
-import { createRouteMap } from '@framework/router'
+import { createRouteDescriptors } from '@framework/router'
+
+register({
+  ignore: [/(node_modules)/],
+  presets: ['@babel/preset-env', '@babel/preset-react'],
+})
 
 import { Shell } from './Shell.js'
+import { importPage } from './importPage.js'
 
 export async function runServer() {
   const app = express()
 
   const root = await findConfig()
+  const path = join(parse(root).dir, 'pages')
   const config = await loadConfig(root)
-  const routeMap = await createRouteMap(join(parse(root).dir, 'pages'))
+  const routes = await createRouteDescriptors(path)
 
   app.use(compression())
   app.use(express.static(join(import.meta.dirname, '..', 'public')))
   app.use((req, res) => {
-    const Component = routeMap.get(req.path)
-    if (!Component || typeof Component !== 'function') {
+    const route = routes.get(req.path)
+    if (!route) {
       return res.status(404).send('Not found')
     }
 
-    const { pipe } = renderToPipeableStream(
-      <Shell>
-        <Component />
-      </Shell>,
-      {
-        // bootstrapModules: ['/main.mjs'],
-        onShellReady() {
-          res.setHeader('content-type', 'text/html')
-          pipe(res)
+    try {
+      const { Page, Layout } = importPage(route, 'dev')
+      if (!Page) {
+        return res.status(404).send('Not found')
+      }
+
+      const { pipe } = renderToPipeableStream(
+        <Shell>
+          {Layout ? (
+            <Layout>
+              <Page />
+            </Layout>
+          ) : (
+            <Page />
+          )}
+        </Shell>,
+        {
+          // bootstrapModules: ['/main.mjs'],
+          onShellReady() {
+            res.setHeader('content-type', 'text/html')
+            pipe(res)
+          },
         },
-      },
-    )
+      )
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Internal server error')
+    }
   })
 
   const port = config.port || 3000

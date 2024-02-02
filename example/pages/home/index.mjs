@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { Header } from '../../components/Header'
+
 export default function Component() {
-  return React.createElement('h1', {}, ['Home'])
+  return <Header>Home</Header>
 }

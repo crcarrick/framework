@@ -28,12 +28,12 @@ function terminate(closer: () => Promise<void>) {
 
 export async function runDevServer() {
   let server = await runServer()
-  let closer = createCloser(server)
+  let closer = createCloser(server, false)
   registerSignals(() => terminate(closer))
 
   for await (const _ of watchServer()) {
     await closer()
     server = await runServer()
-    closer = createCloser(server)
+    closer = createCloser(server, false)
   }
 }
