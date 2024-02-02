@@ -16,7 +16,10 @@ export async function registerWatcher(watchers: Set<FSWatcher>) {
           `\nFile change detected. ${relative(process.cwd(), path)} has changed. Restarting server...\n`,
         )
 
-        watcher.close().then(resolve, reject)
+        watcher.close().then(() => {
+          watchers.delete(watcher)
+          resolve()
+        }, reject)
       })
 
     watchers.add(watcher)

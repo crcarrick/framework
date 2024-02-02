@@ -8,9 +8,14 @@ const SIGNALS = [
 ]
 
 export function registerSignals(terminate: () => void) {
+  let logged = false
+
   SIGNALS.forEach((signal) => {
     process.on(signal, () => {
-      console.log(`\nReceived ${signal}. Shutting down server...\n`)
+      if (!logged) {
+        logged = true
+        console.log(`\nReceived ${signal}. Shutting down server...\n`)
+      }
       terminate()
     })
   })
