@@ -6,16 +6,43 @@ module.exports = {
     tsconfigRootDir: __dirname,
     project: ['./tsconfig.eslint.json', './packages/*/tsconfig.build.json'],
   },
-  plugins: ['@typescript-eslint', 'react', 'react-hooks'],
+  plugins: [
+    '@eslint-community/eslint-comments',
+    '@typescript-eslint',
+    'import',
+    'react',
+    'react-hooks',
+  ],
   extends: [
     'eslint:recommended',
+    'plugin:import/typescript',
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/recommended-type-checked',
+    'plugin:@eslint-community/eslint-comments/recommended',
   ],
   rules: {
     semi: 'off',
+    '@eslint-community/eslint-comments/no-unused-disable': 'error',
+    'import/order': [
+      'error',
+      {
+        'newlines-between': 'always',
+        alphabetize: {
+          order: 'asc',
+        },
+        groups: [
+          'builtin',
+          'external',
+          'internal',
+          'parent',
+          'sibling',
+          'index',
+          'object',
+        ],
+      },
+    ],
     '@typescript-eslint/semi': 'off',
     '@typescript-eslint/no-unused-vars': [
       'error',
@@ -29,5 +56,14 @@ module.exports = {
     ],
     'react/react-in-jsx-scope': 'off',
     'react/jsx-uses-react': 'off',
+  },
+  settings: {
+    'import/internal-regex': '^@framework/',
+    'import/parsers': {
+      '@typescript/eslint-parser': ['.ts', '.tsx'],
+    },
+    react: {
+      version: '^18.2.0',
+    },
   },
 }

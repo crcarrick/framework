@@ -1,12 +1,12 @@
-import { join, parse } from 'node:path'
 import { createServer } from 'node:http'
+import { join, parse } from 'node:path'
 
-import express from 'express'
 import compression from 'compression'
+import express from 'express'
+import { renderToPipeableStream } from 'react-dom/server'
 
 import { findConfig, loadConfig } from '@framework/config'
 import { createRouteMap } from '@framework/router'
-import { renderToPipeableStream } from 'react-dom/server'
 
 import { Shell } from './Shell.js'
 

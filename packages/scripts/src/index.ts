@@ -2,8 +2,8 @@
 
 import process from 'node:process'
 
-import { runServer } from '@framework/server'
 import { runDevServer } from '@framework/dev-server'
+import { runServer } from '@framework/server'
 
 async function main() {
   const args = process.argv.slice(2)

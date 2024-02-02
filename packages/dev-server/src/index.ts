@@ -1,5 +1,6 @@
-import { runServer } from '@framework/server'
 import type { FSWatcher } from 'chokidar'
+
+import { runServer } from '@framework/server'
 
 import { createCloser } from './createCloser.js'
 import { registerSignals } from './registerSignals.js'

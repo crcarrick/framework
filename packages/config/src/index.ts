@@ -1,5 +1,5 @@
-import { parse } from 'node:path'
 import { createRequire } from 'node:module'
+import { parse } from 'node:path'
 
 import { findUp } from 'find-up'
 
