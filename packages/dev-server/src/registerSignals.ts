@@ -4,7 +4,7 @@ const SIGNALS = [
   'SIGUSR1',
   'SIGUSR2',
   'uncaughtException',
-  'end',
+  'exit',
 ]
 
 export function registerSignals(terminate: () => void) {
