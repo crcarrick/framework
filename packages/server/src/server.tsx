@@ -47,9 +47,11 @@ export async function runServer() {
       const Fallback = fallback.Component
 
       if (!Page) {
+        console.error('Page component (index) not found for route:', route.path)
         return res.status(404).send('Not found')
       }
 
+      // TODO: we should only wrap in Suspense / ServerSideData if there's a resource
       const Component = (
         <Suspense fallback={Fallback ? <Fallback /> : <div>Loading...</div>}>
           <ServerSideData resource={page.resource}>
