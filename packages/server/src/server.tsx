@@ -17,6 +17,7 @@ register({
 
 import { ServerSideData } from './components/ServerSideData.js'
 import { Shell } from './components/Shell.js'
+import { createSSRMetadata } from './utils/createSSRMetadata.js'
 import { importPage } from './utils/importPage.js'
 
 export async function runServer() {
@@ -28,6 +29,7 @@ export async function runServer() {
   const routes = await createRouteDescriptors(path)
 
   app.use(compression())
+  app.use(express.static(join(parse(root).dir, '.framework')))
   app.use(express.static(join(import.meta.dirname, '..', 'public')))
   app.use((req, res) => {
     const route = Array.from(routes.values()).find(({ matcher }) => {
@@ -63,7 +65,10 @@ export async function runServer() {
       const { pipe } = renderToPipeableStream(
         <Shell>{Layout ? <Layout>{Component}</Layout> : Component}</Shell>,
         {
-          // bootstrapModules: ['/main.mjs'],
+          bootstrapScripts: ['/bootstrap.js'],
+          bootstrapScriptContent: `
+            window.__SSR_METADATA = ${JSON.stringify(createSSRMetadata(route, { params }))}
+          `,
           onShellReady() {
             res.setHeader('content-type', 'text/html')
             pipe(res)

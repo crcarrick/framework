@@ -1,14 +1,22 @@
+import { join, resolve } from 'node:path'
+
 import type { MatchFunction } from 'path-to-regexp'
 
 import { walk } from '@framework/utils'
 
 import { createMatcher } from './createMatcher.js'
 
+interface RoutePath {
+  path: string
+  buildPath: string
+  relativePath: string
+}
+
 export interface RouteDescriptor {
   path: string
-  page: string | null
-  layout: string | null
-  fallback: string | null
+  page: RoutePath | null
+  layout: RoutePath | null
+  fallback: RoutePath | null
   matcher: MatchFunction
 }
 
@@ -42,7 +50,11 @@ export async function createRouteDescriptors(dir: string) {
       if (curr) {
         routes.set(base, {
           ...curr,
-          page: full,
+          page: {
+            path: full,
+            buildPath: join('.framework', 'pages', base, name) + '.js',
+            relativePath: resolve(base, name),
+          },
         })
       }
     }
@@ -52,7 +64,11 @@ export async function createRouteDescriptors(dir: string) {
       if (curr) {
         routes.set(base, {
           ...curr,
-          layout: full,
+          layout: {
+            path: full,
+            buildPath: join('.framework', 'pages', base, name) + '.js',
+            relativePath: resolve(base, name),
+          },
         })
       }
     }
@@ -62,7 +78,11 @@ export async function createRouteDescriptors(dir: string) {
       if (curr) {
         routes.set(base, {
           ...curr,
-          fallback: full,
+          fallback: {
+            path: full,
+            buildPath: join('.framework', 'pages', base, name) + '.js',
+            relativePath: resolve(base, name),
+          },
         })
       }
     }

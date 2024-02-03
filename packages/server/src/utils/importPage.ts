@@ -35,7 +35,7 @@ interface RouteImport<T extends object = object> {
 
 const require = createRequire(import.meta.url)
 
-function invalidate(urls: Array<string | null>) {
+function invalidate(urls: Array<string | undefined>) {
   for (const url of urls) {
     if (url && require.cache[url]) {
       delete require.cache[url]
@@ -48,12 +48,14 @@ export function importPage(
   params: object,
 ): ImportedRoute {
   if (process.env.NODE_ENV === 'development') {
-    invalidate([page, layout, fallback])
+    invalidate([page?.path, layout?.path, fallback?.path])
   }
 
-  const pageModule = page ? (require(page) as RouteImport) : null
-  const layoutModule = layout ? (require(layout) as RouteImport) : null
-  const fallbackModule = fallback ? (require(fallback) as RouteImport) : null
+  const pageModule = page ? (require(page.path) as RouteImport) : null
+  const layoutModule = layout ? (require(layout.path) as RouteImport) : null
+  const fallbackModule = fallback
+    ? (require(fallback.path) as RouteImport)
+    : null
 
   const Page = pageModule?.default ?? null
   const Layout = layoutModule?.default ?? null

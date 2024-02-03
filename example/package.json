@@ -12,6 +12,7 @@
   },
   "type": "module",
   "scripts": {
+    "build": "framework build",
     "start": "framework start",
     "dev": "framework dev"
   },
@@ -21,5 +22,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "babel-loader": "^9.1.3"
+  }
 }

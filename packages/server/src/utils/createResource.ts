@@ -2,9 +2,11 @@ export interface Resource {
   read(): object
 }
 
-export function createResource(
-  promise: Promise<object> = Promise.resolve({}),
-): Resource {
+/**
+ * hack to suspend while waiting for some data on the server
+ * look into using `use()` instead?
+ */
+export function createResource(promise: Promise<object>): Resource {
   let status = 'pending'
   let result: object
 

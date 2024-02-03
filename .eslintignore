@@ -1,7 +1,9 @@
 !.*
 .eslintrc.js
+**/webpack.config.js
 example/
 node_modules/
 packages/**/dist/
 packages/**/public/
 packages/**/node_modules/
+packages/server/src/bootstrap/
