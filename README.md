@@ -5,7 +5,7 @@
 ## Problems
 
 ```
-- Webpack -- How do we bundle? Is it webpack or something else?
-- Routing -- How does the file system router fit?
-- RSC     -- Can we support RSC?
+- Hydration -- How do we rehydrate on the client?
+- Bundling  -- How do we bundle? Is it webpack or something else?
+- Server    -- Can we support RSC?
 ```
