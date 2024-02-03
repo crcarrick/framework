@@ -44,9 +44,8 @@ function invalidate(url: string) {
 export function importPage(
   { page, layout, fallback }: RouteDescriptor,
   params: object,
-  mode: 'dev' | 'prod' = 'prod',
 ): ImportedRoute {
-  if (mode === 'dev') {
+  if (process.env.NODE_ENV === 'development') {
     for (const url of [page, layout].filter(
       (url): url is Exclude<typeof url, null> => Boolean(url),
     )) {

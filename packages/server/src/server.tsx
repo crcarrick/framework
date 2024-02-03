@@ -39,7 +39,7 @@ export async function runServer() {
     }
 
     const { params } = route.matcher(req.path) || { params: {} }
-    const { page, layout, fallback } = importPage(route, params, 'dev')
+    const { page, layout, fallback } = importPage(route, params)
 
     try {
       const Page = page.Component

@@ -17,10 +17,12 @@ async function main() {
 
   switch (command) {
     case 'dev': {
+      process.env.NODE_ENV = 'development'
       return await runDevServer()
     }
 
     case 'start': {
+      process.env.NODE_ENV = 'production'
       return await runServer()
     }
 
