@@ -43,7 +43,7 @@ export async function findConfig(): Promise<string> {
 const require = createRequire(import.meta.url)
 
 export async function loadConfig(root: string): Promise<Config> {
-  if (require.cache[root]) {
+  if (process.env.NODE_ENV === 'development' && require.cache[root]) {
     delete require.cache[root]
   }
 
