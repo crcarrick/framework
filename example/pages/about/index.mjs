@@ -7,13 +7,19 @@ export async function getServerSideProps() {
     setTimeout(
       () =>
         resolve({
-          title: 'About',
+          name: 'Chris Carrick',
+          email: 'chris@crcarrick.dev',
         }),
       1000,
     )
   })
 }
 
-export default function Component({ title }) {
-  return <Header>{title}</Header>
+export default function AboutPage({ name, email }) {
+  return (
+    <>
+      <Header>{name}</Header>
+      <a href={`mailto:${email}`}>{email}</a>
+    </>
+  )
 }

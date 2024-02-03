@@ -4,6 +4,7 @@ import { join, parse } from 'node:path'
 import register from '@babel/register'
 import compression from 'compression'
 import express from 'express'
+import { Suspense } from 'react'
 import { renderToPipeableStream } from 'react-dom/server'
 
 import { findConfig, loadConfig } from '@framework/config'
@@ -14,6 +15,7 @@ register({
   presets: ['@babel/preset-env', '@babel/preset-react'],
 })
 
+import { ServerSideData } from './components/ServerSideData.js'
 import { Shell } from './components/Shell.js'
 import { importPage } from './utils/importPage.js'
 
@@ -36,48 +38,40 @@ export async function runServer() {
       return res.status(404).send('Not found')
     }
 
-    const match = route.matcher(req.path) || { params: {} }
-    importPage(route, match.params, 'dev')
-      .then(({ page, layout }) => {
-        const Page = page.Component
-        const Layout = layout.Component
+    const { params } = route.matcher(req.path) || { params: {} }
+    const { page, layout, fallback } = importPage(route, params, 'dev')
 
-        if (!Page) {
-          return res.status(404).send('Not found')
-        }
+    try {
+      const Page = page.Component
+      const Layout = layout.Component
+      const Fallback = fallback.Component
 
-        const layoutProps = {
-          ...layout.serverSideProps,
-          params: match.params,
-        }
-        const pageProps = {
-          ...page.serverSideProps,
-          params: match.params,
-        }
+      if (!Page) {
+        return res.status(404).send('Not found')
+      }
 
-        const PageComponent = <Page {...pageProps} />
+      const Component = (
+        <Suspense fallback={Fallback ? <Fallback /> : <div>Loading...</div>}>
+          <ServerSideData resource={page.resource}>
+            <Page params={params} />
+          </ServerSideData>
+        </Suspense>
+      )
 
-        const { pipe } = renderToPipeableStream(
-          <Shell>
-            {Layout ? (
-              <Layout {...layoutProps}>{PageComponent}</Layout>
-            ) : (
-              PageComponent
-            )}
-          </Shell>,
-          {
-            // bootstrapModules: ['/main.mjs'],
-            onShellReady() {
-              res.setHeader('content-type', 'text/html')
-              pipe(res)
-            },
+      const { pipe } = renderToPipeableStream(
+        <Shell>{Layout ? <Layout>{Component}</Layout> : Component}</Shell>,
+        {
+          // bootstrapModules: ['/main.mjs'],
+          onShellReady() {
+            res.setHeader('content-type', 'text/html')
+            pipe(res)
           },
-        )
-      })
-      .catch((err) => {
-        console.error(err)
-        res.status(500).send('Internal server error')
-      })
+        },
+      )
+    } catch (err) {
+      console.error(err)
+      res.status(500).send('Internal server error')
+    }
   })
 
   const port = config.port || 3000

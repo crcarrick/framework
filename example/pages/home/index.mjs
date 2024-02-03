@@ -2,6 +2,6 @@ import React from 'react'
 
 import { Header } from '../../components/Header'
 
-export default function Component() {
+export default function HomePage() {
   return <Header>Home</Header>
 }

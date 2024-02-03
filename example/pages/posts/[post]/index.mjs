@@ -14,7 +14,7 @@ export async function getServerSideProps({ params }) {
   })
 }
 
-export default function Component({ title, params }) {
+export default function Post({ title, params }) {
   return (
     <Header>
       {title}: {params.post}

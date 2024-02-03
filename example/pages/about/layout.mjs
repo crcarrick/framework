@@ -1,5 +1,5 @@
 import React from 'react'
 
-export default function Component({ children }) {
-  return <div style={{ backgroundColor: 'blue' }}>{children}</div>
+export default function AboutLayout({ children }) {
+  return <div style={{ backgroundColor: 'lightgray' }}>{children}</div>
 }

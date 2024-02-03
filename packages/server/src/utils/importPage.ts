@@ -4,18 +4,24 @@ import type { ComponentType, PropsWithChildren } from 'react'
 
 import type { RouteDescriptor } from '@framework/router'
 
+import { createResource, type Resource } from './createResource.js'
+
 interface Params {
   params?: object
 }
 
-interface ImportedRouteComponent<T> {
+interface ImportedRouteComponent {
   Component: ComponentType<PropsWithChildren<Params>> | null
-  serverSideProps: T
 }
 
-interface ImportedRoute<TPage = object, TLayout = object> {
-  page: ImportedRouteComponent<TPage>
-  layout: ImportedRouteComponent<TLayout>
+interface ImportedPageComponent extends ImportedRouteComponent {
+  resource: Resource
+}
+
+interface ImportedRoute {
+  page: ImportedPageComponent
+  layout: ImportedRouteComponent
+  fallback: ImportedRouteComponent
 }
 
 interface GetServerSideProps<T extends object> {
@@ -35,11 +41,11 @@ function invalidate(url: string) {
   }
 }
 
-export async function importPage(
-  { page, layout }: RouteDescriptor,
+export function importPage(
+  { page, layout, fallback }: RouteDescriptor,
   params: object,
   mode: 'dev' | 'prod' = 'prod',
-): Promise<ImportedRoute> {
+): ImportedRoute {
   if (mode === 'dev') {
     for (const url of [page, layout].filter(
       (url): url is Exclude<typeof url, null> => Boolean(url),
@@ -50,25 +56,20 @@ export async function importPage(
 
   const pageModule = page ? (require(page) as RouteImport) : null
   const layoutModule = layout ? (require(layout) as RouteImport) : null
+  const fallbackModule = fallback ? (require(fallback) as RouteImport) : null
 
   const Page = pageModule?.default ?? null
   const Layout = layoutModule?.default ?? null
+  const Fallback = fallbackModule?.default ?? null
 
-  const pageProps = pageModule?.getServerSideProps
-    ? await pageModule.getServerSideProps({ params })
-    : {}
-  const layoutProps = layoutModule?.getServerSideProps
-    ? await layoutModule.getServerSideProps({ params })
-    : {}
+  const resource =
+    pageModule && pageModule.getServerSideProps
+      ? createResource(pageModule.getServerSideProps({ params }))
+      : createResource(Promise.resolve({}))
 
   return {
-    page: {
-      Component: Page,
-      serverSideProps: pageProps,
-    },
-    layout: {
-      Component: Layout,
-      serverSideProps: layoutProps,
-    },
+    page: { Component: Page, resource },
+    layout: { Component: Layout },
+    fallback: { Component: Fallback },
   }
 }

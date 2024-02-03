@@ -8,13 +8,15 @@ export interface RouteDescriptor {
   path: string
   page: string | null
   layout: string | null
+  fallback: string | null
   matcher: MatchFunction
 }
 
 type RouteDescriptors = Map<string, RouteDescriptor>
 
-const LAYOUT_RE = /^layout\.((c|m)?js)$/
 const PAGE_RE = /^index\.((c|m)?js)$/
+const LAYOUT_RE = /^layout\.((c|m)?js)$/
+const FALLBACK_RE = /^fallback\.((c|m)?js)$/
 
 export async function createRouteDescriptors(dir: string) {
   const routes: RouteDescriptors = new Map()
@@ -30,8 +32,19 @@ export async function createRouteDescriptors(dir: string) {
         path: base,
         page: null,
         layout: null,
+        fallback: null,
         matcher: createMatcher(base),
       })
+    }
+
+    if (PAGE_RE.test(name)) {
+      const curr = routes.get(base)
+      if (curr) {
+        routes.set(base, {
+          ...curr,
+          page: full,
+        })
+      }
     }
 
     if (LAYOUT_RE.test(name)) {
@@ -44,12 +57,12 @@ export async function createRouteDescriptors(dir: string) {
       }
     }
 
-    if (PAGE_RE.test(name)) {
+    if (FALLBACK_RE.test(name)) {
       const curr = routes.get(base)
       if (curr) {
         routes.set(base, {
           ...curr,
-          page: full,
+          fallback: full,
         })
       }
     }
