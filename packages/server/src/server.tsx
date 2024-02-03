@@ -55,14 +55,14 @@ export async function runServer() {
           params: match.params,
         }
 
+        const PageComponent = <Page {...pageProps} />
+
         const { pipe } = renderToPipeableStream(
           <Shell>
             {Layout ? (
-              <Layout {...layoutProps}>
-                <Page {...pageProps} />
-              </Layout>
+              <Layout {...layoutProps}>{PageComponent}</Layout>
             ) : (
-              <Page {...pageProps} />
+              PageComponent
             )}
           </Shell>,
           {
