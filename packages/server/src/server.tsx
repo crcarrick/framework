@@ -28,12 +28,16 @@ export async function runServer() {
   app.use(compression())
   app.use(express.static(join(import.meta.dirname, '..', 'public')))
   app.use((req, res) => {
-    const route = routes.get(req.path)
+    const route = Array.from(routes.values()).find(({ matcher }) => {
+      return matcher(req.path)
+    })
+
     if (!route) {
       return res.status(404).send('Not found')
     }
 
-    importPage(route, 'dev')
+    const match = route.matcher(req.path) || { params: {} }
+    importPage(route, match.params, 'dev')
       .then(({ page, layout }) => {
         const Page = page.Component
         const Layout = layout.Component
@@ -42,14 +46,23 @@ export async function runServer() {
           return res.status(404).send('Not found')
         }
 
+        const layoutProps = {
+          ...layout.serverSideProps,
+          params: match.params,
+        }
+        const pageProps = {
+          ...page.serverSideProps,
+          params: match.params,
+        }
+
         const { pipe } = renderToPipeableStream(
           <Shell>
             {Layout ? (
-              <Layout {...layout.serverSideProps}>
-                <Page {...page.serverSideProps} />
+              <Layout {...layoutProps}>
+                <Page {...pageProps} />
               </Layout>
             ) : (
-              <Page />
+              <Page {...pageProps} />
             )}
           </Shell>,
           {

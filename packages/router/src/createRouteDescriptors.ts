@@ -1,8 +1,14 @@
+import type { MatchFunction } from 'path-to-regexp'
+
 import { walk } from '@framework/utils'
 
+import { createMatcher } from './createMatcher.js'
+
 export interface RouteDescriptor {
+  path: string
   page: string | null
   layout: string | null
+  matcher: MatchFunction
 }
 
 type RouteDescriptors = Map<string, RouteDescriptor>
@@ -21,8 +27,10 @@ export async function createRouteDescriptors(dir: string) {
   for await (const { base, full, name } of walker) {
     if (!routes.has(base)) {
       routes.set(base, {
+        path: base,
         page: null,
         layout: null,
+        matcher: createMatcher(base),
       })
     }
 

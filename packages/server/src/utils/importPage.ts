@@ -1,28 +1,29 @@
 import { createRequire } from 'node:module'
 
-import type { ComponentType } from 'react'
+import type { ComponentType, PropsWithChildren } from 'react'
 
 import type { RouteDescriptor } from '@framework/router'
 
-interface ImportedRouteComponent<T extends object = object> {
-  Component: ComponentType<T> | null
+interface Params {
+  params?: object
+}
+
+interface ImportedRouteComponent<T> {
+  Component: ComponentType<PropsWithChildren<Params>> | null
   serverSideProps: T
 }
 
-interface ImportedRoute<
-  TPage extends object = object,
-  TLayout extends object = object,
-> {
+interface ImportedRoute<TPage = object, TLayout = object> {
   page: ImportedRouteComponent<TPage>
   layout: ImportedRouteComponent<TLayout>
 }
 
 interface GetServerSideProps<T extends object> {
-  (): Promise<T>
+  (args: { params: object }): Promise<T>
 }
 
 interface RouteImport<T extends object = object> {
-  default: ComponentType<T>
+  default: ComponentType<PropsWithChildren<Params>>
   getServerSideProps?: GetServerSideProps<T>
 }
 
@@ -36,6 +37,7 @@ function invalidate(url: string) {
 
 export async function importPage(
   { page, layout }: RouteDescriptor,
+  params: object,
   mode: 'dev' | 'prod' = 'prod',
 ): Promise<ImportedRoute> {
   if (mode === 'dev') {
@@ -53,10 +55,10 @@ export async function importPage(
   const Layout = layoutModule?.default ?? null
 
   const pageProps = pageModule?.getServerSideProps
-    ? await pageModule.getServerSideProps()
+    ? await pageModule.getServerSideProps({ params })
     : {}
   const layoutProps = layoutModule?.getServerSideProps
-    ? await layoutModule.getServerSideProps()
+    ? await layoutModule.getServerSideProps({ params })
     : {}
 
   return {

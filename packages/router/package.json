@@ -20,7 +20,8 @@
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
-    "@framework/utils": "workspace:^"
+    "@framework/utils": "workspace:^",
+    "path-to-regexp": "^6.2.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.48",
