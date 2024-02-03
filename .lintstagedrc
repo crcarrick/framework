@@ -1,0 +1,6 @@
+{
+  "*.ts{,x}": [
+    "prettier **/*.ts{,x} --write --log-level error",
+    "eslint --ext .ts,.tsx ."
+  ]
+}

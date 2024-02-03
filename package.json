@@ -16,13 +16,12 @@
     "packages/*"
   ],
   "scripts": {
-    "lint": "eslint --ext .ts,.tsx .",
     "build": "pnpm run -r build",
     "clean": "pnpm run -r clean",
     "tests": "pnpm run -r tests",
     "watch": "pnpm run -r --parallel watch",
-    "prepare": "husky",
-    "prettier": "prettier **/*.ts{,x} --write --log-level error"
+    "precomm": "lint-staged",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@eslint-community/eslint-plugin-eslint-comments": "^4.1.0",
@@ -34,6 +33,7 @@
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^9.0.10",
+    "lint-staged": "^15.2.1",
     "prettier": "^3.2.4",
     "rimraf": "^5.0.5"
   }
