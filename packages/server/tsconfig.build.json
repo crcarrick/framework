@@ -1,7 +1,9 @@
 {
   "extends": "../../tsconfig.build.json",
   "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules", "dist", "src/bootstrap.tsx"],
   "compilerOptions": {
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "lib": ["es2022", "dom"]
   }
 }

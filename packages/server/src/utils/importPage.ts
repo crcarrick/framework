@@ -1,8 +1,6 @@
-import { createRequire } from 'node:module'
-
 import type { ComponentType, PropsWithChildren } from 'react'
 
-import type { RouteDescriptor } from '@framework/router'
+import type { RouteDescriptor, RoutePath } from '@framework/router'
 
 import { createResource, type Resource } from './createResource.js'
 
@@ -33,28 +31,31 @@ interface RouteImport<T extends object = object> {
   getServerSideProps?: GetServerSideProps<T>
 }
 
-const require = createRequire(import.meta.url)
-
-function invalidate(urls: Array<string | undefined>) {
-  for (const url of urls) {
-    if (url && require.cache[url]) {
-      delete require.cache[url]
-    }
-  }
+function invalidate(routePath: RoutePath | null) {
+  return routePath
+    ? {
+        ...routePath,
+        path: `${routePath.path}?t=${Date.now()}`,
+      }
+    : null
 }
 
-export function importPage(
+export async function importPage(
   { page, layout, fallback }: RouteDescriptor,
   params: object,
-): ImportedRoute {
+): Promise<ImportedRoute> {
   if (process.env.NODE_ENV === 'development') {
-    invalidate([page?.path, layout?.path, fallback?.path])
+    page = invalidate(page)
+    layout = invalidate(layout)
+    fallback = invalidate(fallback)
   }
 
-  const pageModule = page ? (require(page.path) as RouteImport) : null
-  const layoutModule = layout ? (require(layout.path) as RouteImport) : null
+  const pageModule = page ? ((await import(page.path)) as RouteImport) : null
+  const layoutModule = layout
+    ? ((await import(layout.path)) as RouteImport)
+    : null
   const fallbackModule = fallback
-    ? (require(fallback.path) as RouteImport)
+    ? ((await import(fallback.path)) as RouteImport)
     : null
 
   const Page = pageModule?.default ?? null

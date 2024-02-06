@@ -8,7 +8,7 @@ export function Shell({ children }: ShellProps) {
   return (
     <html lang="en">
       <head>
-        <meta charSet="utf-8" />
+        <meta httpEquiv="Content-Type" content="text/html;charset=utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Framework</title>
       </head>

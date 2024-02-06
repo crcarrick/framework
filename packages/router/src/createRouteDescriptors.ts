@@ -1,4 +1,4 @@
-import { join, resolve } from 'node:path'
+import { resolve } from 'node:path'
 
 import type { MatchFunction } from 'path-to-regexp'
 
@@ -6,9 +6,8 @@ import { walk } from '@framework/utils'
 
 import { createMatcher } from './createMatcher.js'
 
-interface RoutePath {
+export interface RoutePath {
   path: string
-  buildPath: string
   relativePath: string
 }
 
@@ -22,7 +21,7 @@ export interface RouteDescriptor {
 
 type RouteDescriptors = Map<string, RouteDescriptor>
 
-const PAGE_RE = /^index\.((c|m)?js)$/
+const PAGE_RE = /^page\.((c|m)?js)$/
 const LAYOUT_RE = /^layout\.((c|m)?js)$/
 const FALLBACK_RE = /^fallback\.((c|m)?js)$/
 
@@ -35,7 +34,12 @@ export async function createRouteDescriptors(dir: string) {
   })
 
   for await (const { base, full, name } of walker) {
-    if (!routes.has(base)) {
+    const isPage = PAGE_RE.test(name)
+    const isLayout = LAYOUT_RE.test(name)
+    const isFallback = FALLBACK_RE.test(name)
+    const isRouteComponent = isPage || isLayout || isFallback
+
+    if (!routes.has(base) && isRouteComponent) {
       routes.set(base, {
         path: base,
         page: null,
@@ -45,42 +49,39 @@ export async function createRouteDescriptors(dir: string) {
       })
     }
 
-    if (PAGE_RE.test(name)) {
+    if (isPage) {
       const curr = routes.get(base)
       if (curr) {
         routes.set(base, {
           ...curr,
           page: {
             path: full,
-            buildPath: join('.framework', 'pages', base, name) + '.js',
             relativePath: resolve(base, name),
           },
         })
       }
     }
 
-    if (LAYOUT_RE.test(name)) {
+    if (isLayout) {
       const curr = routes.get(base)
       if (curr) {
         routes.set(base, {
           ...curr,
           layout: {
             path: full,
-            buildPath: join('.framework', 'pages', base, name) + '.js',
             relativePath: resolve(base, name),
           },
         })
       }
     }
 
-    if (FALLBACK_RE.test(name)) {
+    if (isFallback) {
       const curr = routes.get(base)
       if (curr) {
         routes.set(base, {
           ...curr,
           fallback: {
             path: full,
-            buildPath: join('.framework', 'pages', base, name) + '.js',
             relativePath: resolve(base, name),
           },
         })

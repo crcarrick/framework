@@ -19,8 +19,8 @@
   "dependencies": {
     "@framework/scripts": "workspace:^",
     "express": "^4.18.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react": "18.3.0-canary-95ec12839-20240205",
+    "react-dom": "18.3.0-canary-95ec12839-20240205"
   },
   "devDependencies": {
     "babel-loader": "^9.1.3"

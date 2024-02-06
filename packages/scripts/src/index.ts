@@ -3,72 +3,47 @@
 import { join } from 'node:path'
 import process from 'node:process'
 
+import esbuild, { type BuildOptions } from 'esbuild'
 import { rimraf } from 'rimraf'
-import webpack from 'webpack'
+// import webpack from 'webpack'
 
 import { runDevServer } from '@framework/dev-server'
 import { runServer } from '@framework/server'
 import { walk } from '@framework/utils'
 
-async function runWebpack() {
+async function runEsbuild(watch = false) {
   await rimraf(join(process.cwd(), '.framework'))
-  const files: Record<string, string> = {}
-  // const files: string[] = []
-  for await (const file of walk(process.cwd(), {
-    match: '.mjs',
+  const entryPoints: string[] = []
+  for await (const file of walk(join(process.cwd(), 'pages'), {
+    match: '(.mjs|.js|.jsx|.ts|.tsx)',
     ignore: 'node_modules',
   })) {
-    files[join(file.base, file.name)] = file.full
-    // files.push(file.full)
+    entryPoints.push(file.full)
   }
 
-  return new Promise<void>((resolve, reject) => {
-    const compiler = webpack({
-      mode: 'development',
-      entry: files,
-      module: {
-        rules: [
-          {
-            test: /\.mjs$/,
-            use: {
-              loader: 'babel-loader',
-              options: {
-                // plugins: [
-                //   '@babel/plugin-transform-runtime',
-                //   '@babel/plugin-transform-typescript',
-                // ],
-                presets: ['@babel/preset-env', '@babel/preset-react'],
-              },
-            },
-          },
-        ],
-      },
-      experiments: {
-        outputModule: true,
-      },
-      output: {
-        libraryTarget: 'module',
-        path: join(process.cwd(), '.framework'),
-        filename: '[name]',
-      },
-      optimization: {
-        splitChunks: {
-          chunks: 'all',
-        },
-      },
-    })
+  const options: BuildOptions = {
+    entryPoints,
+    bundle: true,
+    // minify: true,
+    outdir: join(process.cwd(), '.framework'),
+    format: 'esm',
+    splitting: true,
+    sourcemap: watch,
+    loader: {
+      '.js': 'jsx',
+      '.ts': 'tsx',
+      '.jsx': 'jsx',
+      '.tsx': 'tsx',
+      '.mjs': 'jsx',
+    },
+  }
 
-    compiler.run((err, stats) => {
-      if (err) {
-        return reject(err)
-      }
-
-      console.log('\n\n\n')
-      console.log(stats?.toJson().entrypoints)
-      console.log('\n\n\n')
-      resolve()
-    })
-  })
+  if (watch) {
+    const context = await esbuild.context(options)
+    await context.watch()
+  } else {
+    await esbuild.build(options)
+  }
 }
 
 async function main() {
@@ -84,17 +59,18 @@ async function main() {
   switch (command) {
     case 'dev': {
       process.env.NODE_ENV = 'development'
-      return await runDevServer()
+      return await Promise.all([runEsbuild(true), runDevServer()])
     }
 
     case 'start': {
       process.env.NODE_ENV = 'production'
+      await runEsbuild()
       return await runServer()
     }
 
     case 'build': {
       process.env.NODE_ENV = 'production'
-      return await runWebpack()
+      return await runEsbuild()
     }
 
     default: {

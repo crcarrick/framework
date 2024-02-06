@@ -2,7 +2,7 @@ import { join } from 'node:path'
 
 import type { RouteDescriptor } from '@framework/router'
 
-interface JSONComponent {
+export interface JSONComponent {
   type: string
   props: {
     children: JSONComponent[]
@@ -13,7 +13,7 @@ interface JSONComponent {
 
 // yikes
 function toType(path: string) {
-  return join('/', 'pages', path)
+  return join('/', path.replace('.mjs', '.js'))
 }
 
 /**
