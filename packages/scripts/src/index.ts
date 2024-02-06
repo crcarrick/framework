@@ -5,7 +5,6 @@ import process from 'node:process'
 
 import esbuild, { type BuildOptions } from 'esbuild'
 import { rimraf } from 'rimraf'
-// import webpack from 'webpack'
 
 import { runDevServer } from '@framework/dev-server'
 import { runServer } from '@framework/server'

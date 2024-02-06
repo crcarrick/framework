@@ -1,19 +1,13 @@
 import { createServer } from 'node:http'
 import { join, parse } from 'node:path'
 
-import register from '@babel/register'
 import compression from 'compression'
 import express from 'express'
 // import { Suspense } from 'react'
-import { renderToPipeableStream, renderToString } from 'react-dom/server'
+import { renderToPipeableStream } from 'react-dom/server'
 
 import { findConfig, loadConfig } from '@framework/config'
 import { createRouteDescriptors } from '@framework/router'
-
-register({
-  ignore: [/(node_modules)/],
-  presets: ['@babel/preset-env', '@babel/preset-react'],
-})
 
 // import { ServerSideData } from './components/ServerSideData.js'
 import { Shell } from './components/Shell.js'
@@ -65,14 +59,6 @@ export async function runServer() {
         // )
         const Component = <Page params={params} />
 
-        const __SSR_DEBUG =
-          process.env.NODE_ENV === 'development'
-            ? renderToString(
-                <Shell>
-                  {Layout ? <Layout>{Component}</Layout> : Component}
-                </Shell>,
-              )
-            : ''
         const __SSR_METADATA = JSON.stringify(
           createSSRMetadata(route, { params }),
         )
@@ -82,7 +68,6 @@ export async function runServer() {
           {
             bootstrapModules: ['/bootstrap.mjs'],
             bootstrapScriptContent: `
-              window.__SSR_DEBUG = '${__SSR_DEBUG}';
               window.__SSR_METADATA = ${__SSR_METADATA};
             `,
             onShellReady() {
