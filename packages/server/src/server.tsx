@@ -1,7 +1,6 @@
 import { createServer } from 'node:http'
 import { join, parse } from 'node:path'
 
-import register from '@babel/register'
 import compression from 'compression'
 import express from 'express'
 import { Suspense } from 'react'
@@ -9,11 +8,6 @@ import { renderToPipeableStream } from 'react-dom/server'
 
 import { findConfig, loadConfig } from '@framework/config'
 import { createRouteDescriptors } from '@framework/router'
-
-register({
-  ignore: [/(node_modules)/],
-  presets: ['@babel/preset-env', '@babel/preset-react'],
-})
 
 import { ServerSideData } from './components/ServerSideData.js'
 import { Shell } from './components/Shell.js'

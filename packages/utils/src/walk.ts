@@ -71,7 +71,7 @@ export function* walkSync(
         base: base,
         full: join(start, dirent.name),
         name: dirent.name,
-        path: join(base, dirent.name),
+        path: dirent.path,
       }
     }
   }

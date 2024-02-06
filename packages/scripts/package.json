@@ -23,7 +23,9 @@
   },
   "dependencies": {
     "@framework/dev-server": "workspace:^",
-    "@framework/server": "workspace:^"
+    "@framework/server": "workspace:^",
+    "@framework/utils": "workspace:^",
+    "esbuild": "^0.20.0"
   },
   "devDependencies": {
     "typescript": "^5.3.3"
