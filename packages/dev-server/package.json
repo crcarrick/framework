@@ -23,7 +23,13 @@
     "@framework/server": "workspace:^",
     "chokidar": "^3.5.3"
   },
+  "peerDependencies": {
+    "@framework/server": "workspace:^",
+    "chokidar": "^3.5.3"
+  },
   "devDependencies": {
+    "@framework/server": "workspace:^",
+    "chokidar": "^3.5.3",
     "typescript": "^5.3.3"
   }
 }

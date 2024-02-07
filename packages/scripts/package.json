@@ -21,13 +21,17 @@
     "watch": "pnpm clean && tsc -p tsconfig.build.json --watch",
     "prepublishOnly": "pnpm build"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@framework/dev-server": "workspace:^",
     "@framework/server": "workspace:^",
     "@framework/utils": "workspace:^",
     "esbuild": "^0.20.0"
   },
   "devDependencies": {
+    "@framework/dev-server": "workspace:^",
+    "@framework/server": "workspace:^",
+    "@framework/utils": "workspace:^",
+    "esbuild": "^0.20.0",
     "typescript": "^5.3.3"
   }
 }

@@ -22,7 +22,7 @@ async function getServerEntryPoints(): Promise<EntryPoint[]> {
   const files: EntryPoint[] = [
     {
       in: createRequire(import.meta.url).resolve('@framework/server'),
-      out: join('server', 'server'),
+      out: 'index',
     },
   ]
 
@@ -31,7 +31,7 @@ async function getServerEntryPoints(): Promise<EntryPoint[]> {
     const { name } = parse(file.full)
     files.push({
       in: file.full,
-      out: join('server', file.base, name),
+      out: join('pages', file.base, name),
     })
   }
 
@@ -40,14 +40,22 @@ async function getServerEntryPoints(): Promise<EntryPoint[]> {
 
 async function getClientEntryPoints(): Promise<EntryPoint[]> {
   const pages = join(process.cwd(), 'pages')
-  const files: EntryPoint[] = []
+  const files: EntryPoint[] = [
+    {
+      in: join(
+        parse(createRequire(import.meta.url).resolve('@framework/server')).dir,
+        'bootstrap.js',
+      ),
+      out: 'bootstrap',
+    },
+  ]
 
   const walker = walk(pages, { match: /\.(js|ts)x?$/, ignore: /node_modules/ })
   for await (const file of walker) {
     const { name } = parse(file.full)
     files.push({
       in: file.full,
-      out: join('client', file.base, name),
+      out: join('pages', file.base, name),
     })
   }
 
@@ -57,7 +65,6 @@ async function getClientEntryPoints(): Promise<EntryPoint[]> {
 const commonOptions: BuildOptions = {
   bundle: true,
   format: 'esm',
-  outdir: '.framework',
   splitting: true,
   loader: {
     '.js': 'jsx',
@@ -85,11 +92,15 @@ async function build() {
   await Promise.all([
     esbuild.build({
       ...commonOptions,
+      platform: 'browser',
+      outdir: join('.framework', 'public'),
       entryPoints: await getClientEntryPoints(),
     }),
     esbuild.build({
       ...commonOptions,
       platform: 'node',
+      packages: 'external',
+      outdir: join('.framework', 'server'),
       entryPoints: await getServerEntryPoints(),
     }),
   ])

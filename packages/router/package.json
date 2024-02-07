@@ -19,12 +19,14 @@
     "watch": "pnpm clean && tsc -p tsconfig.build.json --watch",
     "prepublishOnly": "pnpm build"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@framework/utils": "workspace:^",
     "path-to-regexp": "^6.2.1"
   },
   "devDependencies": {
+    "@framework/utils": "workspace:^",
     "@types/react": "^18.2.48",
+    "path-to-regexp": "^6.2.1",
     "typescript": "^5.3.3"
   }
 }
