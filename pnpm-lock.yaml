@@ -78,11 +78,11 @@ importers:
         specifier: ^3.0.3
         version: 3.0.3
       react:
-        specifier: 18.3.0-canary-95ec12839-20240205
-        version: 18.3.0-canary-95ec12839-20240205
+        specifier: 0.0.0-experimental-2cd19ed1d-20240207
+        version: 0.0.0-experimental-2cd19ed1d-20240207
       react-dom:
-        specifier: 18.3.0-canary-95ec12839-20240205
-        version: 18.3.0-canary-95ec12839-20240205(react@18.3.0-canary-95ec12839-20240205)
+        specifier: 0.0.0-experimental-2cd19ed1d-20240207
+        version: 0.0.0-experimental-2cd19ed1d-20240207(react@0.0.0-experimental-2cd19ed1d-20240207)
     devDependencies:
       '@types/react':
         specifier: 18.2.55
@@ -145,11 +145,11 @@ importers:
   packages/server:
     dependencies:
       react:
-        specifier: 18.3.0-canary-95ec12839-20240205
-        version: 18.3.0-canary-95ec12839-20240205
+        specifier: 0.0.0-experimental-2cd19ed1d-20240207
+        version: 0.0.0-experimental-2cd19ed1d-20240207
       react-dom:
-        specifier: 18.3.0-canary-95ec12839-20240205
-        version: 18.3.0-canary-95ec12839-20240205(react@18.3.0-canary-95ec12839-20240205)
+        specifier: 0.0.0-experimental-2cd19ed1d-20240207
+        version: 0.0.0-experimental-2cd19ed1d-20240207(react@0.0.0-experimental-2cd19ed1d-20240207)
     devDependencies:
       '@framework/config':
         specifier: workspace:^
@@ -2700,22 +2700,22 @@ packages:
       iconv-lite: 0.4.24
       unpipe: 1.0.0
 
-  /react-dom@18.3.0-canary-95ec12839-20240205(react@18.3.0-canary-95ec12839-20240205):
-    resolution: {integrity: sha512-qXFv1LwYpE0nVz+HgI7hLMz67Nnrt407iOcqAFuLg+TJUw6Fe7oJodCOrIbtsTnZ4VyLJ/77jXkK+kDUmJUwrQ==}
+  /react-dom@0.0.0-experimental-2cd19ed1d-20240207(react@0.0.0-experimental-2cd19ed1d-20240207):
+    resolution: {integrity: sha512-12+bfSm+1sg7MGSmBgRXInNM5nbG7/XhpEX3oGJjxiFaT2Wft9X/F+2iErQJDkU7A9cQctlNw7NEjMZKjcWBGQ==}
     peerDependencies:
-      react: 18.3.0-canary-95ec12839-20240205
+      react: 0.0.0-experimental-2cd19ed1d-20240207
     dependencies:
       loose-envify: 1.4.0
-      react: 18.3.0-canary-95ec12839-20240205
-      scheduler: 0.24.0-canary-95ec12839-20240205
+      react: 0.0.0-experimental-2cd19ed1d-20240207
+      scheduler: 0.0.0-experimental-2cd19ed1d-20240207
     dev: false
 
   /react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
     dev: true
 
-  /react@18.3.0-canary-95ec12839-20240205:
-    resolution: {integrity: sha512-smLWoYJK1ah/FcE0cZDSfJe495ScpjYde5pwI75Z1sJZ3AyBOFDe2ziqONMc2H8x8BV6YhP9yRvMqiKjVQ0ZKQ==}
+  /react@0.0.0-experimental-2cd19ed1d-20240207:
+    resolution: {integrity: sha512-BNo2NZmpR/31RGJAstPhJQ2xTZZyNlrtNvaXb3/nluAxezZnZLvSiiOz84vJE/CHO4BoR2jThC+3sRYB227m2Q==}
     engines: {node: '>=0.10.0'}
     dependencies:
       loose-envify: 1.4.0
@@ -2838,8 +2838,8 @@ packages:
   /safer-buffer@2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
 
-  /scheduler@0.24.0-canary-95ec12839-20240205:
-    resolution: {integrity: sha512-hCQt/8+N8rlSMvGn3VKoKEIsAkJncM3hxp9ie75j+hFCDJPh8RTXTyFs9Bu/G58I0/+Tv9f2r4N6CpLeH8lOBQ==}
+  /scheduler@0.0.0-experimental-2cd19ed1d-20240207:
+    resolution: {integrity: sha512-vhydgQXTJmrdIBnZKhC2QtosojvRbXFKEfNj9YDp550ydzHr0bjYk5sV/m2nysz5dE2qIKU+AglxrjUjJ68nXg==}
     dependencies:
       loose-envify: 1.4.0
     dev: false
