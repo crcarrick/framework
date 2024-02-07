@@ -25,7 +25,7 @@ export default function AboutPage({
   return (
     <>
       <Header>{name}</Header>
-      <a href={`mailto:${email}`}>{email}</a>
+      <a href={`mailto:${email}`}>Email: {email}</a>
     </>
   )
 }

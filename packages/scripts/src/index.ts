@@ -1,30 +1,35 @@
 import { createRequire } from 'node:module'
-import { join, parse } from 'node:path'
+import { join, parse, relative } from 'node:path'
 import process from 'node:process'
 
 import esbuild, { type BuildOptions } from 'esbuild'
+import nodemon from 'nodemon'
 
 import { walk } from '@framework/utils'
+
+import { registerSignals } from './registerSignals.js'
 
 interface EntryPoint {
   in: string
   out: string
 }
 
-type Command = 'dev' | 'start' | 'build'
+type Command = 'dev' | 'start' | 'build' | 'debug'
 
 function isCommand(command: string): command is Command {
-  return command === 'dev' || command === 'start' || command === 'build'
+  return (
+    command === 'dev' ||
+    command === 'start' ||
+    command === 'build' ||
+    command === 'debug'
+  )
 }
 
-async function getServerEntryPoints(): Promise<EntryPoint[]> {
-  const pages = join(process.cwd(), 'pages')
-  const files: EntryPoint[] = [
-    {
-      in: createRequire(import.meta.url).resolve('@framework/server'),
-      out: 'index',
-    },
-  ]
+async function getEntryPoints(
+  initialEntryPoints: EntryPoint[],
+): Promise<EntryPoint[]> {
+  const pages = join(process.cwd(), 'src', 'pages')
+  const files: EntryPoint[] = [...initialEntryPoints]
 
   const walker = walk(pages, { match: /\.(js|ts)x?$/, ignore: /node_modules/ })
   for await (const file of walker) {
@@ -38,9 +43,8 @@ async function getServerEntryPoints(): Promise<EntryPoint[]> {
   return files
 }
 
-async function getClientEntryPoints(): Promise<EntryPoint[]> {
-  const pages = join(process.cwd(), 'pages')
-  const files: EntryPoint[] = [
+function getClientEntryPoints() {
+  return getEntryPoints([
     {
       in: join(
         parse(createRequire(import.meta.url).resolve('@framework/server')).dir,
@@ -48,21 +52,19 @@ async function getClientEntryPoints(): Promise<EntryPoint[]> {
       ),
       out: 'bootstrap',
     },
-  ]
-
-  const walker = walk(pages, { match: /\.(js|ts)x?$/, ignore: /node_modules/ })
-  for await (const file of walker) {
-    const { name } = parse(file.full)
-    files.push({
-      in: file.full,
-      out: join('pages', file.base, name),
-    })
-  }
-
-  return files
+  ])
 }
 
-const commonOptions: BuildOptions = {
+function getServerEntryPoints() {
+  return getEntryPoints([
+    {
+      in: createRequire(import.meta.url).resolve('@framework/server'),
+      out: 'index',
+    },
+  ])
+}
+
+const BASE_OPTIONS: BuildOptions = {
   bundle: true,
   format: 'esm',
   splitting: true,
@@ -72,38 +74,95 @@ const commonOptions: BuildOptions = {
   },
 }
 
-async function devServer() {
-  const serverEntries = await getServerEntryPoints()
-
-  await build()
-
-  const context = await esbuild.context({
-    ...commonOptions,
-    platform: 'node',
-    entryPoints: serverEntries,
-  })
-
-  await context.serve()
+async function getClientOptions(): Promise<BuildOptions> {
+  return {
+    ...BASE_OPTIONS,
+    platform: 'browser',
+    outdir: join('.framework', 'public'),
+    entryPoints: await getClientEntryPoints(),
+  }
 }
 
-async function startServer() {}
+async function getServerOptions(): Promise<BuildOptions> {
+  return {
+    ...BASE_OPTIONS,
+    platform: 'node',
+    packages: 'external',
+    outdir: join('.framework', 'server'),
+    entryPoints: await getServerEntryPoints(),
+  }
+}
+
+async function buildClient() {
+  const options = await getClientOptions()
+
+  return esbuild.build(options)
+}
+
+async function buildServer() {
+  const options = await getServerOptions()
+
+  return esbuild.build(options)
+}
 
 async function build() {
-  await Promise.all([
-    esbuild.build({
-      ...commonOptions,
-      platform: 'browser',
-      outdir: join('.framework', 'public'),
-      entryPoints: await getClientEntryPoints(),
-    }),
-    esbuild.build({
-      ...commonOptions,
-      platform: 'node',
-      packages: 'external',
-      outdir: join('.framework', 'server'),
-      entryPoints: await getServerEntryPoints(),
-    }),
-  ])
+  await Promise.all([buildClient(), buildServer()])
+}
+
+async function devServer(debug = false) {
+  const clientOptions = await getClientOptions()
+  const serverOptions = await getServerOptions()
+  const clientContext = await esbuild.context(clientOptions)
+  const serverContext = await esbuild.context(serverOptions)
+
+  registerSignals(() => {
+    Promise.all([clientContext.dispose(), serverContext.dispose()]).then(
+      () => process.exit(0),
+      () => process.exit(1),
+    )
+  })
+
+  await Promise.all([clientContext.watch(), serverContext.watch()])
+
+  const watch = ['src/**/*']
+  // FIXME: little hack to help me while i'm developing this thing
+  if (debug) {
+    watch.push('.framework/server/index.js')
+    watch.push('.framework/public/bootstrap.js')
+  }
+
+  const server = nodemon({
+    ext: 'js,ts,jsx,tsx',
+    delay: debug ? 2000 : 100,
+    script: join('.framework', 'server', 'index.js'),
+    ignore: ['node_modules'],
+    watch,
+  })
+
+  server.on('restart', (allFiles) => {
+    const files =
+      allFiles &&
+      allFiles.filter((file) =>
+        ['chunk', 'index', 'bootstrap'].every((name) => !file.includes(name)),
+      )
+    if (files && files.length > 0) {
+      const changed = files.length === 1 ? files[0] : files.length
+      const message =
+        typeof changed === 'number'
+          ? `${changed} files changed`
+          : `${relative(process.cwd(), changed)} has changed`
+
+      console.log(`\n${message}. Restarting server...\n`)
+    } else {
+      console.log('\nFile change detected. Restarting server...\n')
+    }
+  })
+}
+
+// TODO: how would we run this in a production ready way?
+async function startServer() {
+  await build()
+  await import(join(process.cwd(), '.framework', 'server', 'index.js'))
 }
 
 async function main() {
@@ -121,7 +180,8 @@ async function main() {
     process.exit(1)
   }
 
-  process.env.NODE_ENV = command === 'dev' ? 'development' : 'production'
+  process.env.NODE_ENV =
+    command === 'dev' || command === 'debug' ? 'development' : 'production'
 
   switch (command) {
     case 'dev': {
@@ -135,9 +195,11 @@ async function main() {
     case 'build': {
       return await build()
     }
-  }
 
-  return Promise.resolve()
+    case 'debug': {
+      return await devServer(true)
+    }
+  }
 }
 
 main().catch((err) => {

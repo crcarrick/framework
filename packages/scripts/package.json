@@ -22,16 +22,17 @@
     "prepublishOnly": "pnpm build"
   },
   "peerDependencies": {
-    "@framework/dev-server": "workspace:^",
-    "@framework/server": "workspace:^",
-    "@framework/utils": "workspace:^",
-    "esbuild": "^0.20.0"
-  },
-  "devDependencies": {
-    "@framework/dev-server": "workspace:^",
     "@framework/server": "workspace:^",
     "@framework/utils": "workspace:^",
     "esbuild": "^0.20.0",
+    "nodemon": "^3.0.3"
+  },
+  "devDependencies": {
+    "@framework/server": "workspace:^",
+    "@framework/utils": "workspace:^",
+    "@types/nodemon": "^1.19.6",
+    "esbuild": "^0.20.0",
+    "nodemon": "^3.0.3",
     "typescript": "^5.3.3"
   }
 }
