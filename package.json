@@ -2,7 +2,7 @@
   "name": "framework",
   "private": true,
   "version": "0.0.0",
-  "description": "Building my own React framework (for fun)",
+  "description": "Mediocre metaframework clone",
   "repository": "https://github.com/crcarrick/framework.git",
   "author": {
     "name": "Chris Carrick",
