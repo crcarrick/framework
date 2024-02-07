@@ -1,41 +1,37 @@
-import type { ComponentType, ReactNode } from 'react'
+import { Suspense, type ComponentType, type ReactNode } from 'react'
 import { hydrateRoot } from 'react-dom/client'
 
 import { Shell } from './components/Shell.js'
-import type { JSONComponent } from './utils/createSSRMetadata.js'
+import type { SSRMetadata } from './utils/createSSRMetadata.js'
 
 declare global {
   interface Window {
-    __SSR_DEBUG: string
-    __SSR_METADATA: JSONComponent
+    __SSR_METADATA: SSRMetadata
   }
 }
 
 async function importComponent(path: string) {
   const module = (await import(path)) as {
-    default: ComponentType<{ children: ReactNode }>
+    default: ComponentType<{ children?: ReactNode }>
   }
   return module.default
 }
 
-async function renderComponent(representation: JSONComponent) {
-  if (
-    typeof representation === 'string' ||
-    typeof representation === 'number'
-  ) {
-    return representation
-  }
+async function renderComponent(metadata: SSRMetadata) {
+  const { page, layout, fallback } = metadata
 
-  const { type, props } = representation
-  const { children, ...restProps } = props
-  const Component = await importComponent(type)
-  const renderedChildren = await Promise.all(children.map(renderComponent))
+  const Page = await importComponent(page.type)
+  const Layout = layout ? await importComponent(layout.type) : null
+  const Fallback = fallback ? await importComponent(fallback.type) : null
 
-  return (
-    <Component key={type} {...restProps}>
-      {renderedChildren}
-    </Component>
+  const FallbackComponent = Fallback ? <Fallback /> : <div>Loading...</div>
+  const PageComponent = (
+    <Suspense fallback={FallbackComponent}>
+      <Page {...page.props} />
+    </Suspense>
   )
+
+  return Layout ? <Layout>{PageComponent}</Layout> : PageComponent
 }
 
 async function hydrate() {
@@ -45,7 +41,5 @@ async function hydrate() {
   hydrateRoot(document, <Shell>{tree}</Shell>)
 }
 
-hydrate().catch((err) => {
-  console.error(err)
-  console.log('Hydration failed')
-})
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
+hydrate()

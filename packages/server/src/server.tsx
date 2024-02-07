@@ -3,13 +3,12 @@ import { join, parse } from 'node:path'
 
 import compression from 'compression'
 import express from 'express'
-// import { Suspense } from 'react'
+import { Suspense } from 'react'
 import { renderToPipeableStream } from 'react-dom/server'
 
 import { findConfig, loadConfig } from '@framework/config'
 import { createRouteDescriptors } from '@framework/router'
 
-// import { ServerSideData } from './components/ServerSideData.js'
 import { Shell } from './components/Shell.js'
 import { createSSRMetadata } from './utils/createSSRMetadata.js'
 import { importPage } from './utils/importPage.js'
@@ -32,18 +31,18 @@ export async function runServer() {
       return matcher(req.path)
     })
 
-    console.log(route)
-
     if (!route) {
       return res.status(404).send('Not found')
     }
 
     const { params } = route.matcher(req.path) || { params: {} }
     importPage(route, params)
-      .then(({ page, layout /* fallback */ }) => {
+      .then((importedRoute) => {
+        const { page, layout, fallback } = importedRoute
+
         const Page = page.Component
         const Layout = layout.Component
-        // const Fallback = fallback.Component
+        const Fallback = fallback.Component
 
         if (!Page) {
           console.error(
@@ -53,29 +52,43 @@ export async function runServer() {
           return res.status(404).send('Not found')
         }
 
-        // TODO: we should only wrap in Suspense / ServerSideData if there's a resource
-        // const Component = (
-        //   <Suspense fallback={Fallback ? <Fallback /> : <div>Loading...</div>}>
-        //     <ServerSideData resource={page.resource}>
-        //       <Page params={params} />
-        //     </ServerSideData>
-        //   </Suspense>
-        // )
-        const Component = <Page params={params} />
+        // TODO: this stinks because we have to wait for the ssr data before we can
+        //       even start rendering the page
+        page.loader
+          .then((data) => {
+            const props = {
+              ...params,
+              ...data,
+            }
 
-        const { pipe } = renderToPipeableStream(
-          <Shell>{Layout ? <Layout>{Component}</Layout> : Component}</Shell>,
-          {
-            bootstrapModules: ['/public/bootstrap.js'],
-            bootstrapScriptContent: `
-              window.__SSR_METADATA = ${JSON.stringify(createSSRMetadata(route, { params }))}
-            `,
-            onShellReady() {
-              res.setHeader('content-type', 'text/html')
-              pipe(res)
-            },
-          },
-        )
+            const PageComponent = (
+              <Suspense
+                fallback={Fallback ? <Fallback /> : <div>Loading...</div>}
+              >
+                <Page {...props} />
+              </Suspense>
+            )
+            const App = (
+              <Shell>
+                {Layout ? <Layout>{PageComponent}</Layout> : PageComponent}
+              </Shell>
+            )
+
+            const { pipe } = renderToPipeableStream(App, {
+              bootstrapModules: ['/public/bootstrap.js'],
+              bootstrapScriptContent: `
+                window.__SSR_METADATA = ${JSON.stringify(createSSRMetadata(route, props))}
+              `,
+              onShellReady() {
+                res.setHeader('content-type', 'text/html')
+                pipe(res)
+              },
+            })
+          })
+          .catch((err) => {
+            console.error(err)
+            res.status(500).send('Internal server error')
+          })
       })
       .catch((err) => {
         console.error(err)

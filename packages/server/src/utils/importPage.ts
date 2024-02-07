@@ -2,8 +2,6 @@ import type { ComponentType, PropsWithChildren } from 'react'
 
 import type { RouteDescriptor, RoutePath } from '@framework/router'
 
-import { createResource, type Resource } from './createResource.js'
-
 interface Params {
   params?: object
 }
@@ -12,11 +10,12 @@ interface ImportedRouteComponent {
   Component: ComponentType<PropsWithChildren<Params>> | null
 }
 
-interface ImportedPageComponent extends ImportedRouteComponent {
-  resource: Resource
+interface ImportedPageComponent {
+  Component: ComponentType<PropsWithChildren<Params & object>> | null
+  loader: Promise<object>
 }
 
-interface ImportedRoute {
+export interface ImportedRoute {
   page: ImportedPageComponent
   layout: ImportedRouteComponent
   fallback: ImportedRouteComponent
@@ -64,13 +63,13 @@ export async function importPage(
   const Layout = layoutModule?.default ?? null
   const Fallback = fallbackModule?.default ?? null
 
-  const resource =
-    pageModule && pageModule.getServerSideProps
-      ? createResource(pageModule.getServerSideProps({ params }))
-      : createResource(Promise.resolve({}))
+  const loader =
+    pageModule && pageModule.getServerSideProps !== undefined
+      ? pageModule?.getServerSideProps({ params })
+      : Promise.resolve({})
 
   return {
-    page: { Component: Page, resource },
+    page: { Component: Page, loader },
     layout: { Component: Layout },
     fallback: { Component: Fallback },
   }
