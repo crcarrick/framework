@@ -124,7 +124,12 @@ async function devServer(debug = false) {
 
   await Promise.all([clientContext.watch(), serverContext.watch()])
 
-  const watch = ['src/**/*']
+  const watch = [
+    'src/**/*',
+    'framework.config.js',
+    'framework.config.cjs',
+    'framework.config.json',
+  ]
   // FIXME: little hack to help me while i'm developing this thing
   if (debug) {
     watch.push('.framework/server/index.js')

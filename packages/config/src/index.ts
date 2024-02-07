@@ -29,7 +29,6 @@ export async function findConfig(): Promise<string> {
   const root = await findUp([
     'framework.config.js',
     'framework.config.cjs',
-    'framework.config.mjs',
     'framework.config.json',
   ])
 
@@ -43,10 +42,6 @@ export async function findConfig(): Promise<string> {
 const require = createRequire(import.meta.url)
 
 export async function loadConfig(root: string): Promise<Config> {
-  if (process.env.NODE_ENV === 'development' && require.cache[root]) {
-    delete require.cache[root]
-  }
-
   const parsed = parse(root)
   const config = require(root) as Config | (() => Config)
 

@@ -1,6 +1,6 @@
 import type { ComponentType, PropsWithChildren } from 'react'
 
-import type { RouteDescriptor, RoutePath } from '@framework/router'
+import type { RouteDescriptor } from '@framework/router'
 
 interface Params {
   params?: object
@@ -30,25 +30,10 @@ interface RouteImport<T extends object = object> {
   getServerSideProps?: GetServerSideProps<T>
 }
 
-function invalidate(routePath: RoutePath | null) {
-  return routePath
-    ? {
-        ...routePath,
-        fullPath: `${routePath.serverPath}?t=${Date.now()}`,
-      }
-    : null
-}
-
 export async function importPage(
   { page, layout, fallback }: RouteDescriptor,
   params: object,
 ): Promise<ImportedRoute> {
-  if (process.env.NODE_ENV === 'development') {
-    page = invalidate(page)
-    layout = invalidate(layout)
-    fallback = invalidate(fallback)
-  }
-
   const pageModule = page
     ? ((await import(page.serverPath)) as RouteImport)
     : null
