@@ -5,7 +5,9 @@
 ## Problems
 
 ```
-- Hydration -- How do we rehydrate on the client?
-- Bundling  -- How do we bundle? Is it webpack or something else?
-- Server    -- Can we support RSC?
+- Routing -- Slots
+- Routing -- Route Groups (shared layouts)
+- Bundle  -- Bundle route components (page, layout, fallback) together
+- Server  -- Can we support RSC?
+- Server  -- SSR / Suspense stuff is pretty shitty atm
 ```
