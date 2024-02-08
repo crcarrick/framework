@@ -58,9 +58,11 @@ export async function importPage(
     )
   }
 
-  const metadata: Metadata = pageModule?.generateMetadata
-    ? await Promise.resolve(pageModule.generateMetadata({ params }))
-    : pageModule?.metadata ?? {}
+  const metadata: Metadata =
+    pageModule && pageModule.generateMetadata !== undefined
+      ? await Promise.resolve(pageModule.generateMetadata({ params }))
+      : pageModule?.metadata ?? {}
+  // what is `cache()` actually doing for us here?
   const loader = cache(() =>
     pageModule && pageModule.getServerSideProps !== undefined
       ? Promise.resolve(pageModule?.getServerSideProps({ params }))
