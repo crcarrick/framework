@@ -29,8 +29,7 @@ export class FrameworkResponse<T> extends Writable {
       this._shouldWriteScript &&
       this._promise.status === 'resolved'
     ) {
-      // it's probably not super safe to stringify arbitrary, user provided data :D
-      const content = `<script>window.__SSP = ${JSON.stringify(this._promise.value)}</script>`
+      const content = `<script>__SSP = ${JSON.stringify(this._promise.value)}</script>`
       this._writable.write(new TextEncoder().encode(content))
       this._shouldWriteScript = false
     }

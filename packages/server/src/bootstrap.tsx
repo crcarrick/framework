@@ -1,14 +1,15 @@
 import { Suspense, type ComponentType, type ReactNode } from 'react'
 import { hydrateRoot } from 'react-dom/client'
 
-import { ServerSideProps } from './components/ServerSideProps.js'
-import { Shell } from './components/Shell.js'
-import type { SSRMetadata } from './utils/createSSRMetadata.js'
+import { App } from './components/App.js'
+import { GSSPResolver } from './components/GSSPResolver.js'
+import { Loading } from './components/Loading.js'
+import type { SSRRepresentation } from './utils/toSSRRepresentation.js'
 
 declare global {
   interface Window {
     __SSP: object
-    __SSR_METADATA: SSRMetadata
+    __SSR: SSRRepresentation
   }
 }
 
@@ -31,30 +32,26 @@ async function resource() {
   })
 }
 
-async function renderComponent(metadata: SSRMetadata) {
-  const { page, layout, fallback } = metadata
-
+async function renderComponent({ page, layout, fallback }: SSRRepresentation) {
   const Page = await importComponent(page.type)
   const Layout = layout ? await importComponent(layout.type) : null
   const Fallback = fallback ? await importComponent(fallback.type) : null
 
-  const FallbackComponent = Fallback ? <Fallback /> : <div>Loading...</div>
-  const PageComponent = (
-    <Suspense fallback={FallbackComponent}>
-      <ServerSideProps resource={resource()}>
+  const PageComponent = () => (
+    <Suspense fallback={Fallback ? <Fallback /> : <Loading />}>
+      <GSSPResolver resource={resource()}>
         <Page {...page.props} />
-      </ServerSideProps>
+      </GSSPResolver>
     </Suspense>
   )
 
-  return Layout ? <Layout>{PageComponent}</Layout> : PageComponent
+  return <App layout={Layout} page={PageComponent} />
 }
 
 async function hydrate() {
-  const data = window.__SSR_METADATA || {}
-  const tree = await renderComponent(data)
+  const App = await renderComponent(window.__SSR || {})
 
-  hydrateRoot(document, <Shell>{tree}</Shell>)
+  hydrateRoot(document, App)
 }
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises

@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react'
 
-interface ShellProps {
+interface SSRShellProps {
   children: ReactNode
 }
 
-export function Shell({ children }: ShellProps) {
+export function SSRShell({ children }: SSRShellProps) {
   return (
     <html lang="en">
       <head>

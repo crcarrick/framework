@@ -6,12 +6,12 @@ import {
   type Usable,
 } from 'react'
 
-interface ServerSidePropsProps<T = {}> {
+interface GSSPProps<T = {}> {
   children: ReactNode
   resource: Usable<T>
 }
 
-export function ServerSideProps({ children, resource }: ServerSidePropsProps) {
+export function GSSPResolver({ children, resource }: GSSPProps) {
   const data = use(resource)
 
   if (!isValidElement(children)) {
