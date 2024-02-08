@@ -7,6 +7,7 @@ import nodemon from 'nodemon'
 
 import { walk } from '@framework/utils'
 
+import { FrameworkPlugin } from './plugin.js'
 import { registerSignals } from './utils/registerSignals.js'
 
 interface EntryPoint {
@@ -86,6 +87,8 @@ async function getClientOptions(): Promise<BuildOptions> {
 async function getServerOptions(): Promise<BuildOptions> {
   return {
     ...BASE_OPTIONS,
+    plugins: [FrameworkPlugin],
+    metafile: true,
     platform: 'node',
     packages: 'external',
     outdir: join('.framework', 'server'),

@@ -20,6 +20,7 @@
     "clean": "pnpm run -r clean",
     "tests": "pnpm run -r tests",
     "watch": "pnpm run -r --parallel watch",
+    "fresh": "find . -name 'node_modules' -type d -prune -exec echo 'Deleting {}' \\; -exec rm -rf {} \\;",
     "precomm": "lint-staged",
     "prepare": "husky"
   },
