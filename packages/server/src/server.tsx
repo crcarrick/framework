@@ -61,7 +61,7 @@ export async function runServer() {
         )
 
         const resource = page.loader()
-        const props = { ...params }
+        const props = { params }
         const PageComponent = (
           <Suspense fallback={FallbackComponent}>
             <ServerSideProps resource={resource}>
