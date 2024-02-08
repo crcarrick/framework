@@ -7,7 +7,7 @@ import nodemon from 'nodemon'
 
 import { walk } from '@framework/utils'
 
-import { registerSignals } from './registerSignals.js'
+import { registerSignals } from './utils/registerSignals.js'
 
 interface EntryPoint {
   in: string

@@ -1,6 +1,7 @@
 import { join } from 'node:path'
 
 import type { RouteDescriptor } from '@framework/router'
+import type { Metadata } from '@framework/types'
 
 export interface SSRComponent {
   type: string
@@ -11,6 +12,7 @@ export interface SSRRepresentation {
   page: SSRComponent
   layout: SSRComponent | null
   fallback: SSRComponent | null
+  metadata: Metadata
 }
 
 function toType(path: string) {
@@ -20,9 +22,10 @@ function toType(path: string) {
 // this only works if the structure of our routes are consistent
 export function toSSRRepresentation<T extends object = {}>(
   route: RouteDescriptor,
+  metadata: Metadata,
   pageProps: T,
 ) {
-  const representation = {} as SSRRepresentation
+  const representation = { metadata } as SSRRepresentation
 
   if (!route.page) {
     throw new Error('Something weird happened')

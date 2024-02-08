@@ -29,9 +29,12 @@ export class FrameworkResponse<T> extends Writable {
       this._shouldWriteScript &&
       this._promise.status === 'resolved'
     ) {
-      const content = `<script>__SSP = ${JSON.stringify(this._promise.value)}</script>`
-      this._writable.write(new TextEncoder().encode(content))
       this._shouldWriteScript = false
+      this._writable.write(
+        new TextEncoder().encode(
+          `<script>__SSP = ${JSON.stringify(this._promise.value)}</script>`,
+        ),
+      )
     }
 
     const result = this._writable.write(chunk)

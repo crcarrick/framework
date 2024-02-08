@@ -38,5 +38,8 @@
     "compression": "^1.7.4",
     "find-up": "^7.0.0",
     "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@framework/types": "workspace:^"
   }
 }

@@ -144,6 +144,9 @@ importers:
 
   packages/server:
     dependencies:
+      '@framework/types':
+        specifier: workspace:^
+        version: link:../types
       express:
         specifier: ^5.0.0-beta.1
         version: 5.0.0-beta.1

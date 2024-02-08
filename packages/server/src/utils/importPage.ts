@@ -1,6 +1,7 @@
 import { cache, type ComponentType, type PropsWithChildren } from 'react'
 
 import type { RouteDescriptor } from '@framework/router'
+import type { Metadata } from '@framework/types'
 
 interface Params {
   params?: object
@@ -13,6 +14,7 @@ interface ImportedRouteComponent {
 interface ImportedPageComponent<T = {}> {
   Component: ComponentType<PropsWithChildren<Params & T>> | null
   loader: () => Promise<T>
+  metadata: Metadata
 }
 
 export interface ImportedRoute<T = {}> {
@@ -28,6 +30,7 @@ interface GetServerSideProps<T extends object> {
 interface RouteImport<T extends object = {}> {
   default: ComponentType<PropsWithChildren<Params>>
   getServerSideProps?: GetServerSideProps<T>
+  metadata: Metadata
 }
 
 export async function importPage(
@@ -48,6 +51,7 @@ export async function importPage(
   const Layout = layoutModule?.default ?? null
   const Fallback = fallbackModule?.default ?? null
 
+  const metadata = pageModule?.metadata ?? {}
   const loader = cache(() =>
     pageModule && pageModule.getServerSideProps !== undefined
       ? pageModule?.getServerSideProps({ params })
@@ -55,7 +59,7 @@ export async function importPage(
   )
 
   return {
-    page: { Component: Page, loader },
+    page: { Component: Page, loader, metadata },
     layout: { Component: Layout },
     fallback: { Component: Fallback },
   }

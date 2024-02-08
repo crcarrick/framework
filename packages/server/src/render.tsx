@@ -1,5 +1,5 @@
 import type { Response } from 'express'
-import { Suspense } from 'react'
+import { Suspense, type ComponentProps } from 'react'
 import { renderToPipeableStream } from 'react-dom/server'
 
 import type { RouteDescriptor } from '@framework/router'
@@ -29,36 +29,38 @@ export async function render<T extends object>(
     return send404(res)
   }
 
+  const metadata = page.metadata
   const resource = page.loader()
   const response = new FrameworkResponse(res, resource)
-  const pageProps = { params }
-  const PageComponent = () => (
-    <Suspense fallback={Fallback ? <Fallback /> : <Loading />}>
-      <GSSPResolver resource={resource}>
-        <Page {...pageProps} />
-      </GSSPResolver>
-    </Suspense>
-  )
+  const pageProps: ComponentProps<typeof Page> = { params }
+  const appProps: ComponentProps<typeof App> = {
+    metadata,
+    layout: Layout,
+    page: () => (
+      <Suspense fallback={Fallback ? <Fallback /> : <Loading />}>
+        <GSSPResolver resource={resource}>
+          <Page {...pageProps} />
+        </GSSPResolver>
+      </Suspense>
+    ),
+  }
 
-  const stream = renderToPipeableStream(
-    <App layout={Layout} page={PageComponent} />,
-    {
-      bootstrapModules: ['/public/bootstrap.js'],
-      bootstrapScriptContent: `
-        __SSR = ${toSSRRepresentation(route, pageProps)};
+  const stream = renderToPipeableStream(<App {...appProps} />, {
+    bootstrapModules: ['/public/bootstrap.js'],
+    bootstrapScriptContent: `
+        __SSR = ${toSSRRepresentation(route, metadata, pageProps)};
       `,
-      onShellReady() {
-        response.shellReady = true
-        res.setHeader('content-type', 'text/html')
-        // @ts-expect-error idk
-        stream.pipe(response)
-      },
-      onShellError(err) {
-        console.error(err)
-      },
-      onError(err) {
-        console.error(err)
-      },
+    onShellReady() {
+      response.shellReady = true
+      res.setHeader('content-type', 'text/html')
+      // @ts-expect-error idk
+      stream.pipe(response)
     },
-  )
+    onShellError(err) {
+      console.error(err)
+    },
+    onError(err) {
+      console.error(err)
+    },
+  })
 }
