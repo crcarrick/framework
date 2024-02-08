@@ -1,7 +1,11 @@
 import { cache, type ComponentType, type PropsWithChildren } from 'react'
 
 import type { RouteDescriptor } from '@framework/router'
-import type { Metadata } from '@framework/types'
+import type {
+  GenerateMetadata,
+  GetServerSideProps,
+  Metadata,
+} from '@framework/types'
 
 interface Params {
   params?: object
@@ -23,14 +27,11 @@ export interface ImportedRoute<T = {}> {
   fallback: ImportedRouteComponent
 }
 
-interface GetServerSideProps<T extends object> {
-  (args: { params: object }): Promise<T>
-}
-
 interface RouteImport<T extends object = {}> {
   default: ComponentType<PropsWithChildren<Params>>
   getServerSideProps?: GetServerSideProps<T>
-  metadata: Metadata
+  generateMetadata?: GenerateMetadata<T>
+  metadata?: Metadata
 }
 
 export async function importPage(
@@ -51,10 +52,18 @@ export async function importPage(
   const Layout = layoutModule?.default ?? null
   const Fallback = fallbackModule?.default ?? null
 
-  const metadata = pageModule?.metadata ?? {}
+  if (pageModule?.generateMetadata && pageModule?.metadata) {
+    console.warn(
+      `Page ${page?.clientPath} has both a generateMetadata and a metadata export. Using generateMetadata.`,
+    )
+  }
+
+  const metadata: Metadata = pageModule?.generateMetadata
+    ? await Promise.resolve(pageModule.generateMetadata({ params }))
+    : pageModule?.metadata ?? {}
   const loader = cache(() =>
     pageModule && pageModule.getServerSideProps !== undefined
-      ? pageModule?.getServerSideProps({ params })
+      ? Promise.resolve(pageModule?.getServerSideProps({ params }))
       : Promise.resolve({}),
   )
 

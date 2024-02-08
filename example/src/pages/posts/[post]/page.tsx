@@ -1,4 +1,5 @@
 import type {
+  GenerateMetadata,
   GetServerSideProps,
   FrameworkComponentProps,
 } from '@framework/types'
@@ -9,12 +10,19 @@ interface Params {
   post: string
 }
 
+export const generateMetadata = (({ params }) => {
+  return {
+    title: `Post: ${params.post}`,
+  }
+}) satisfies GenerateMetadata<Params>
+
 export const getServerSideProps = (({ params }) => {
-  return new Promise<{ title: string }>((resolve) => {
+  return new Promise<{ description: string }>((resolve) => {
     setTimeout(
       () =>
         resolve({
-          title: params.post === 'imspecial' ? 'Best Post' : 'Post',
+          description:
+            params.post === 'veryspecialpost' ? 'Best Post' : 'Okay Post',
         }),
       1000,
     )
@@ -22,12 +30,13 @@ export const getServerSideProps = (({ params }) => {
 }) satisfies GetServerSideProps<Params>
 
 export default function Post({
-  title,
+  description,
   params,
 }: FrameworkComponentProps<Params, typeof getServerSideProps>) {
   return (
-    <Header>
-      {title}: {params.post}
-    </Header>
+    <div>
+      <Header>{params.post}</Header>
+      <p>{description}</p>
+    </div>
   )
 }

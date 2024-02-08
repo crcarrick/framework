@@ -10,7 +10,7 @@ export type ServerSideProps<T> = {
 }
 
 export interface GetServerSideProps<T = object> {
-  (props: ServerSideProps<T>): Promise<object>
+  (props: ServerSideProps<T>): object | Promise<object>
 }
 
 export type FrameworkComponentProps<T, K> = InferServerSideProps<K> &
@@ -18,4 +18,8 @@ export type FrameworkComponentProps<T, K> = InferServerSideProps<K> &
 
 export interface Metadata {
   title?: string
+}
+
+export interface GenerateMetadata<T> {
+  (props: ServerSideProps<T>): Metadata | Promise<Metadata>
 }
