@@ -9,7 +9,9 @@ import { renderToPipeableStream } from 'react-dom/server'
 import { findConfig, loadConfig } from '@framework/config'
 import { createRouteDescriptors } from '@framework/router'
 
+import { ServerSideProps } from './components/ServerSideProps.js'
 import { Shell } from './components/Shell.js'
+import { FrameworkResponse } from './utils/FrameworkResponse.js'
 import { createSSRMetadata } from './utils/createSSRMetadata.js'
 import { importPage } from './utils/importPage.js'
 
@@ -52,43 +54,50 @@ export async function runServer() {
           return res.status(404).send('Not found')
         }
 
-        // TODO: this stinks because we have to wait for the ssr data before we can
-        //       even start rendering the page
-        page.loader
-          .then((data) => {
-            const props = {
-              ...params,
-              ...data,
-            }
+        const FallbackComponent = Fallback ? (
+          <Fallback />
+        ) : (
+          <div>Loading...</div>
+        )
 
-            const PageComponent = (
-              <Suspense
-                fallback={Fallback ? <Fallback /> : <div>Loading...</div>}
-              >
-                <Page {...props} />
-              </Suspense>
-            )
-            const App = (
-              <Shell>
-                {Layout ? <Layout>{PageComponent}</Layout> : PageComponent}
-              </Shell>
-            )
+        const resource = page.loader()
+        const props = { ...params }
+        const PageComponent = (
+          <Suspense fallback={FallbackComponent}>
+            <ServerSideProps resource={resource}>
+              <Page {...props} />
+            </ServerSideProps>
+          </Suspense>
+        )
 
-            const { pipe } = renderToPipeableStream(App, {
-              bootstrapModules: ['/public/bootstrap.js'],
-              bootstrapScriptContent: `
-                window.__SSR_METADATA = ${JSON.stringify(createSSRMetadata(route, props))}
-              `,
-              onShellReady() {
-                res.setHeader('content-type', 'text/html')
-                pipe(res)
-              },
-            })
-          })
-          .catch((err) => {
-            console.error(err)
-            res.status(500).send('Internal server error')
-          })
+        const LayoutComponent = Layout ? (
+          <Layout>{PageComponent}</Layout>
+        ) : (
+          PageComponent
+        )
+
+        const response = new FrameworkResponse(res, resource)
+        const stream = renderToPipeableStream(
+          <Shell>{LayoutComponent}</Shell>,
+          {
+            bootstrapModules: ['/public/bootstrap.js'],
+            bootstrapScriptContent: `
+            window.__SSR_METADATA = ${JSON.stringify(createSSRMetadata(route, props))}
+          `,
+            onShellReady() {
+              response.shellReady = true
+              res.setHeader('content-type', 'text/html')
+              // @ts-expect-error idk
+              stream.pipe(response)
+            },
+            onShellError(err) {
+              console.error(err)
+            },
+            onError(err) {
+              console.error(err)
+            },
+          },
+        )
       })
       .catch((err) => {
         console.error(err)

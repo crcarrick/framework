@@ -22,7 +22,7 @@ function convertParams(path: string) {
     .join(sep)
 }
 
-export function createMatcher<T extends object = object>(path: string) {
+export function createMatcher<T extends object = {}>(path: string) {
   return match<T>(convertParams(path), {
     sensitive: true,
   })

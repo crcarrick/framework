@@ -11,9 +11,9 @@ type PathParams<T extends string> =
       : { [K in P | keyof PathParams<R>]: string }
     : T extends `${infer _S}/[${infer P}]`
       ? P extends ''
-        ? object
+        ? {}
         : { [K in P]: string }
-      : object
+      : {}
 
 export interface Route<T extends string> {
   path: T

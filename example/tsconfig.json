@@ -1,15 +1,16 @@
 {
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules", ".framework"],
   "compilerOptions": {
     "baseUrl": ".",
     "jsx": "react-jsx",
-    "lib": ["es2022"],
+    "lib": ["es2022", "dom"],
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "target": "esnext",
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
+    "types": ["react/experimental"],
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["node_modules", ".framework"],
 }

@@ -1,4 +1,4 @@
-import type { ComponentType, PropsWithChildren } from 'react'
+import { cache, type ComponentType, type PropsWithChildren } from 'react'
 
 import type { RouteDescriptor } from '@framework/router'
 
@@ -10,13 +10,13 @@ interface ImportedRouteComponent {
   Component: ComponentType<PropsWithChildren<Params>> | null
 }
 
-interface ImportedPageComponent {
-  Component: ComponentType<PropsWithChildren<Params & object>> | null
-  loader: Promise<object>
+interface ImportedPageComponent<T = {}> {
+  Component: ComponentType<PropsWithChildren<Params & T>> | null
+  loader: () => Promise<T>
 }
 
-export interface ImportedRoute {
-  page: ImportedPageComponent
+export interface ImportedRoute<T = {}> {
+  page: ImportedPageComponent<T>
   layout: ImportedRouteComponent
   fallback: ImportedRouteComponent
 }
@@ -25,7 +25,7 @@ interface GetServerSideProps<T extends object> {
   (args: { params: object }): Promise<T>
 }
 
-interface RouteImport<T extends object = object> {
+interface RouteImport<T extends object = {}> {
   default: ComponentType<PropsWithChildren<Params>>
   getServerSideProps?: GetServerSideProps<T>
 }
@@ -48,10 +48,11 @@ export async function importPage(
   const Layout = layoutModule?.default ?? null
   const Fallback = fallbackModule?.default ?? null
 
-  const loader =
+  const loader = cache(() =>
     pageModule && pageModule.getServerSideProps !== undefined
       ? pageModule?.getServerSideProps({ params })
-      : Promise.resolve({})
+      : Promise.resolve({}),
+  )
 
   return {
     page: { Component: Page, loader },

@@ -1,6 +1,5 @@
 !.*
 .eslintrc.js
-example/
 node_modules/
 packages/**/dist/
 packages/**/public/

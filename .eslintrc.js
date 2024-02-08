@@ -4,7 +4,11 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
     tsconfigRootDir: __dirname,
-    project: ['./tsconfig.eslint.json', './packages/*/tsconfig.build.json'],
+    project: [
+      './tsconfig.eslint.json',
+      './packages/*/tsconfig.build.json',
+      './example/tsconfig.json',
+    ],
   },
   plugins: [
     '@eslint-community/eslint-comments',
@@ -41,6 +45,13 @@ module.exports = {
           'index',
           'object',
         ],
+      },
+    ],
+    '@typescript-eslint/ban-types': [
+      'error',
+      {
+        types: { '{}': false },
+        extendDefaults: true,
       },
     ],
     '@typescript-eslint/semi': 'off',

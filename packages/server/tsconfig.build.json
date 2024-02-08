@@ -3,6 +3,7 @@
   "include": ["src/**/*.ts", "src/**/*.tsx"],
   "compilerOptions": {
     "lib": ["es2022", "dom"],
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "types": ["react/experimental"]
   }
 }

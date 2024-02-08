@@ -1,11 +1,13 @@
 import { Suspense, type ComponentType, type ReactNode } from 'react'
 import { hydrateRoot } from 'react-dom/client'
 
+import { ServerSideProps } from './components/ServerSideProps.js'
 import { Shell } from './components/Shell.js'
 import type { SSRMetadata } from './utils/createSSRMetadata.js'
 
 declare global {
   interface Window {
+    __SSP: object
     __SSR_METADATA: SSRMetadata
   }
 }
@@ -15,6 +17,18 @@ async function importComponent(path: string) {
     default: ComponentType<{ children?: ReactNode }>
   }
   return module.default
+}
+
+async function resource() {
+  return new Promise<Window['__SSP']>((resolve) => {
+    // nice hack
+    const interval = setInterval(() => {
+      if (window.__SSP) {
+        clearInterval(interval)
+        resolve(window.__SSP)
+      }
+    }, 10)
+  })
 }
 
 async function renderComponent(metadata: SSRMetadata) {
@@ -27,7 +41,9 @@ async function renderComponent(metadata: SSRMetadata) {
   const FallbackComponent = Fallback ? <Fallback /> : <div>Loading...</div>
   const PageComponent = (
     <Suspense fallback={FallbackComponent}>
-      <Page {...page.props} />
+      <ServerSideProps resource={resource()}>
+        <Page {...page.props} />
+      </ServerSideProps>
     </Suspense>
   )
 

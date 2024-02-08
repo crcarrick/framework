@@ -18,7 +18,10 @@ function toType(path: string) {
 }
 
 // this only works if the structure of our routes are consistent
-export function createSSRMetadata(route: RouteDescriptor, pageProps: object) {
+export function createSSRMetadata<T extends object = {}>(
+  route: RouteDescriptor,
+  pageProps: T,
+) {
   const metadata = {} as SSRMetadata
 
   if (!route.page) {
