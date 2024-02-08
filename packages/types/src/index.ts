@@ -16,8 +16,21 @@ export interface GetServerSideProps<T = object> {
 export type FrameworkComponentProps<T, K> = InferServerSideProps<K> &
   ServerSideProps<T>
 
+interface Author {
+  name: string
+  url?: string
+}
+
 export interface Metadata {
   title?: string
+  description?: string
+  generator?: string
+  applicationName?: string
+  referrer?: string
+  keywords?: string[]
+  authors?: Author[]
+  creator?: string
+  publisher?: string
 }
 
 export interface GenerateMetadata<T> {

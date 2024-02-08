@@ -30,7 +30,7 @@ pnpm debug
 ```
 - Routing -- Slots
 - Routing -- Route Groups (shared layouts)
-- Routing -- Route metadata (title etc)
+- Routing -- Route metadata (✅ but still need to add many fields)
 - Bundle  -- Bundle route components (page, layout, fallback) together
 - Server  -- Can we support RSC?
 - Server  -- SSR / Suspense stuff is (less, but still) pretty shitty atm

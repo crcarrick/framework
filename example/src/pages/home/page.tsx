@@ -4,6 +4,11 @@ import { Header } from '../../components/Header.js'
 
 export const metadata: Metadata = {
   title: 'Home Page',
+  description: 'The home page of our example app.',
+  authors: [
+    { name: 'Chris Carrick' },
+    { name: 'Chris Carrick', url: 'https://crcarrick.dev' },
+  ],
 }
 
 export default function HomePage() {
