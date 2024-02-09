@@ -1,5 +1,4 @@
 import type {
-  GenerateMetadata,
   GetServerSideProps,
   FrameworkComponentProps,
 } from '@framework/types'
@@ -9,12 +8,6 @@ import { Header } from '../../../components/Header.js'
 interface Params {
   post: string
 }
-
-export const generateMetadata = (({ params }) => {
-  return {
-    title: `Post: ${params.post}`,
-  }
-}) satisfies GenerateMetadata<Params>
 
 export const getServerSideProps = (({ params }) => {
   return new Promise<{ description: string }>((resolve) => {
