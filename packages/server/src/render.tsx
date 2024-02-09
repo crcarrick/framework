@@ -17,8 +17,7 @@ export async function render<T extends object>(
   params: T,
   res: Response,
 ) {
-  const importedRoute = await importPage(route, params)
-  const { page, layout, fallback } = importedRoute
+  const { page, layout, fallback } = await importPage(route, params)
 
   const Page = page.Component
   const Layout = layout.Component

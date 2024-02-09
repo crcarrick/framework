@@ -3,7 +3,7 @@ export class ExposedPromise<T> {
   public value: T | undefined
   public error: unknown
 
-  constructor(public promise: Promise<T>) {
+  constructor(private promise: Promise<T>) {
     this.promise.then(
       (value) => {
         this.status = 'resolved'
