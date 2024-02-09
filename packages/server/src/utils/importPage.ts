@@ -1,6 +1,6 @@
 import { cache, type ComponentType, type PropsWithChildren } from 'react'
 
-import type { RouteDescriptor } from '@framework/router'
+import type { Page as Route } from '@framework/build'
 import type {
   GenerateMetadata,
   GetServerSideProps,
@@ -35,33 +35,37 @@ interface RouteImport<T extends object = {}> {
 }
 
 export async function importPage(
-  { page, layout, fallback }: RouteDescriptor,
+  { page, layout, fallback }: Route,
   params: object,
 ): Promise<ImportedRoute> {
   const pageModule = page
-    ? ((await import(page.serverPath)) as RouteImport)
+    ? ((await import(page.imports.server)) as RouteImport)
     : null
   const layoutModule = layout
-    ? ((await import(layout.serverPath)) as RouteImport)
+    ? ((await import(layout.imports.server)) as RouteImport)
     : null
   const fallbackModule = fallback
-    ? ((await import(fallback.serverPath)) as RouteImport)
+    ? ((await import(fallback.imports.server)) as RouteImport)
     : null
 
   const Page = pageModule?.default ?? null
   const Layout = layoutModule?.default ?? null
   const Fallback = fallbackModule?.default ?? null
 
-  if (pageModule?.generateMetadata && pageModule?.metadata) {
+  if (
+    layout?.exports.includes('metadata') &&
+    layout?.exports.includes('generateMetadata')
+  ) {
     console.warn(
-      `Page ${page?.clientPath} has both a generateMetadata and a metadata export. Using generateMetadata.`,
+      `Layout ${layout.imports.client} has both a \`generateMetadata\` and a \`metadata\` export. Using \`generateMetadata\`.`,
     )
   }
 
   const metadata: Metadata =
-    pageModule && pageModule.generateMetadata !== undefined
-      ? await Promise.resolve(pageModule.generateMetadata({ params }))
-      : pageModule?.metadata ?? {}
+    layoutModule && layoutModule.generateMetadata !== undefined
+      ? await Promise.resolve(layoutModule.generateMetadata({ params }))
+      : layoutModule?.metadata ?? {}
+
   // what is `cache()` actually doing for us here?
   const loader = cache(() =>
     pageModule && pageModule.getServerSideProps !== undefined

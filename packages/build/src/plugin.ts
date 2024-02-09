@@ -1,5 +1,6 @@
 import { writeFile } from 'node:fs/promises'
 import { join, parse, sep } from 'node:path'
+import { cwd } from 'node:process'
 
 import type { Plugin, Metafile } from 'esbuild'
 
@@ -19,7 +20,7 @@ interface PageOut {
     server: string
   }
 }
-interface Page extends Record<PageComponent, PageOut> {
+export interface Page extends Partial<Record<PageComponent, PageOut>> {
   route: string
   match: string
 }
@@ -61,7 +62,7 @@ function filterExports(
   })
 }
 
-interface PageManifest {
+export interface PageManifest {
   [routePath: string]: Page
 }
 
@@ -86,33 +87,30 @@ function convertParams(path: string) {
 }
 
 function extractPageManifest({ outputs = {} }: Metafile) {
-  return Object.entries(outputs).reduce<PageManifest>(
-    (acc, [absPath, output]) => {
-      const match = absPath.match(PAGE_REGEX)
+  return Object.entries(outputs).reduce<PageManifest>((acc, [path, output]) => {
+    const match = path.match(PAGE_REGEX)
 
-      if (match !== null) {
-        const [, relPath] = match
-        const { dir, name } = parse(relPath)
-        const routePath = dir === '' ? '/' : dir
+    if (match !== null) {
+      const [, relPath] = match
+      const { dir, name } = parse(relPath)
+      const routePath = dir === '' ? '/' : dir
 
-        if (isValidPageComponent(name, output.exports)) {
-          acc[routePath] ??= {} as Page
-          acc[routePath].route = routePath
-          acc[routePath].match = convertParams(routePath)
-          acc[routePath][name] = {
-            exports: filterExports(name, output.exports),
-            imports: {
-              client: join('/public', relPath),
-              server: join('/server', relPath),
-            },
-          }
+      if (isValidPageComponent(name, output.exports)) {
+        acc[routePath] ??= {} as Page
+        acc[routePath].route = routePath
+        acc[routePath].match = convertParams(routePath)
+        acc[routePath][name] = {
+          exports: filterExports(name, output.exports),
+          imports: {
+            client: join('/public', relPath),
+            server: join(cwd(), path),
+          },
         }
       }
+    }
 
-      return acc
-    },
-    {},
-  )
+    return acc
+  }, {})
 }
 
 export const FrameworkPlugin: Plugin = {
@@ -121,6 +119,7 @@ export const FrameworkPlugin: Plugin = {
     build.onEnd(async (result) => {
       if (result.metafile) {
         const manifest = extractPageManifest(result.metafile)
+        console.log(JSON.stringify(manifest, null, 2))
         await writeFile(
           join('.framework', 'page-manifest.json'),
           JSON.stringify(manifest, null, 2),

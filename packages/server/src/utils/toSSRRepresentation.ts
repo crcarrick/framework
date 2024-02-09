@@ -1,6 +1,6 @@
 import { join } from 'node:path'
 
-import type { RouteDescriptor } from '@framework/router'
+import { Page } from '@framework/build'
 import type { Metadata } from '@framework/types'
 
 export interface SSRComponent {
@@ -21,7 +21,7 @@ function toType(path: string) {
 
 // this only works if the structure of our routes are consistent
 export function toSSRRepresentation<T extends object = {}>(
-  route: RouteDescriptor,
+  route: Page,
   metadata: Metadata,
   pageProps: T,
 ) {
@@ -32,18 +32,18 @@ export function toSSRRepresentation<T extends object = {}>(
   }
 
   representation.page ??= {} as SSRComponent
-  representation.page.type = toType(route.page.clientPath)
+  representation.page.type = toType(route.page.imports.client)
   representation.page.props = pageProps
 
   if (route.layout) {
     representation.layout ??= {} as SSRComponent
-    representation.layout.type = toType(route.layout.clientPath)
+    representation.layout.type = toType(route.layout.imports.client)
     representation.layout.props = {}
   }
 
   if (route.fallback) {
     representation.fallback ??= {} as SSRComponent
-    representation.fallback.type = toType(route.fallback.clientPath)
+    representation.fallback.type = toType(route.fallback.imports.client)
     representation.fallback.props = {}
   }
 

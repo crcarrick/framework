@@ -1,14 +1,12 @@
 {
-  "name": "@framework/scripts",
+  "name": "@framework/build",
   "version": "0.0.1",
-  "description": "A collection of scripts for @framework",
+  "description": "Build @framework",
   "author": {
     "name": "Chris Carrick",
     "email": "chris@crcarrick.dev"
   },
-  "bin": {
-    "framework": "bin/index.js"
-  },
+  "main": "dist/index.js",
   "types": "src/index.ts",
   "files": [
     "bin"
@@ -22,19 +20,10 @@
     "prepublishOnly": "pnpm build"
   },
   "peerDependencies": {
-    "@framework/build": "workspace:^",
-    "@framework/server": "workspace:^",
-    "@framework/utils": "workspace:^",
-    "esbuild": "^0.20.0",
-    "nodemon": "^3.0.3"
+    "esbuild": "^0.20.0"
   },
   "devDependencies": {
-    "@framework/build": "workspace:^",
-    "@framework/server": "workspace:^",
-    "@framework/utils": "workspace:^",
-    "@types/nodemon": "^1.19.6",
     "esbuild": "^0.20.0",
-    "nodemon": "^3.0.3",
     "typescript": "^5.3.3"
   }
 }

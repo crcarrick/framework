@@ -1,11 +1,12 @@
 import { createServer } from 'node:http'
-import { join, parse } from 'node:path'
+import { join } from 'node:path'
+import { cwd } from 'node:process'
 
 import compression from 'compression'
 import express from 'express'
 
 import { findConfig, loadConfig } from '@framework/config'
-import { createRouteDescriptors } from '@framework/router'
+import { createMatcher, getRoutes } from '@framework/router'
 
 import { render } from './render.js'
 import { send404 } from './utils/send404.js'
@@ -14,28 +15,26 @@ export async function runServer() {
   const app = express()
 
   const root = await findConfig()
-  const path = join(parse(root).dir, '.framework', 'server', 'pages')
   const config = await loadConfig(root)
-  const routes = await createRouteDescriptors(path)
+  const routes = await getRoutes(config)
 
   app.use(compression())
-  app.use(
-    '/public',
-    express.static(join(parse(root).dir, '.framework', 'public')),
-  )
-  app.use((req, res) => {
-    const route = Array.from(routes.values()).find(({ matcher }) => {
-      return matcher(req.path)
-    })
+  app.use('/public', express.static(join(cwd(), '.framework', 'public')))
 
-    if (!route) return send404(res)
+  Object.values(routes).forEach((route) => {
+    console.log('Creating route for ' + route.match)
 
-    const { params } = route.matcher(req.path) || { params: {} }
-    render(route, params, res).catch((err) => {
-      console.error(err)
-      res.status(500).send('Internal server error')
+    app.get(route.match, (req, res) => {
+      const matcher = createMatcher(route.match)
+      const { params } = matcher(req.path) || { params: {} }
+      render(route, params, res).catch((err) => {
+        console.error(err)
+        res.status(500).send('Internal server error')
+      })
     })
   })
+
+  app.get('*', (_, res) => send404(res))
 
   const port = config.port || 3000
   const server = createServer(app)

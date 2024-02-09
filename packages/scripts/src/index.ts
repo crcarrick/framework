@@ -5,9 +5,9 @@ import process from 'node:process'
 import esbuild, { type BuildOptions } from 'esbuild'
 import nodemon from 'nodemon'
 
+import { FrameworkPlugin } from '@framework/build'
 import { walk } from '@framework/utils'
 
-import { FrameworkPlugin } from './plugin.js'
 import { registerSignals } from './utils/registerSignals.js'
 
 interface EntryPoint {
@@ -144,6 +144,7 @@ async function devServer(debug = false) {
     delay: debug ? 2000 : 100,
     script: join('.framework', 'server', 'index.js'),
     ignore: ['node_modules'],
+    nodeArgs: ['--no-warnings'],
     watch,
   })
 

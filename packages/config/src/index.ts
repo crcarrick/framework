@@ -5,7 +5,7 @@ import { findUp } from 'find-up'
 
 export interface Config {
   port: number
-  routing?: 'filesystem' | 'manual'
+  routing?: 'filesystem' | 'entries'
 }
 
 const defaultConfig: Config = {

@@ -94,6 +94,15 @@ importers:
         specifier: ^5.3.3
         version: 5.3.3
 
+  packages/build:
+    devDependencies:
+      esbuild:
+        specifier: ^0.20.0
+        version: 0.20.0
+      typescript:
+        specifier: ^5.3.3
+        version: 5.3.3
+
   packages/config:
     devDependencies:
       '@framework/utils':
@@ -108,6 +117,12 @@ importers:
 
   packages/router:
     devDependencies:
+      '@framework/build':
+        specifier: workspace:^
+        version: link:../build
+      '@framework/config':
+        specifier: workspace:^
+        version: link:../config
       '@framework/utils':
         specifier: workspace:^
         version: link:../utils
@@ -123,6 +138,9 @@ importers:
 
   packages/scripts:
     devDependencies:
+      '@framework/build':
+        specifier: workspace:^
+        version: link:../build
       '@framework/server':
         specifier: workspace:^
         version: link:../server
@@ -154,6 +172,9 @@ importers:
         specifier: 0.0.0-experimental-2cd19ed1d-20240207
         version: 0.0.0-experimental-2cd19ed1d-20240207(react@0.0.0-experimental-2cd19ed1d-20240207)
     devDependencies:
+      '@framework/build':
+        specifier: workspace:^
+        version: link:../build
       '@framework/config':
         specifier: workspace:^
         version: link:../config

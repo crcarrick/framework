@@ -2,7 +2,7 @@ import type { Response } from 'express'
 import { Suspense, type ComponentProps } from 'react'
 import { renderToPipeableStream } from 'react-dom/server'
 
-import type { RouteDescriptor } from '@framework/router'
+import type { Page } from '@framework/build'
 
 import { App } from './components/App.js'
 import { GSSPResolver } from './components/GSSPResolver.js'
@@ -13,7 +13,7 @@ import { send404 } from './utils/send404.js'
 import { toSSRRepresentation } from './utils/toSSRRepresentation.js'
 
 export async function render<T extends object>(
-  route: RouteDescriptor,
+  route: Page,
   params: T,
   res: Response,
 ) {
@@ -25,7 +25,7 @@ export async function render<T extends object>(
   const Fallback = fallback.Component
 
   if (!Page) {
-    console.error(`Found no default export at ${route.path}`)
+    console.error(`Found no default export at ${route.route}`)
     return send404(res)
   }
 
