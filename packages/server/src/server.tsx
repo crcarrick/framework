@@ -8,8 +8,8 @@ import express from 'express'
 import { loadConfig } from '@framework/config'
 import { getRoutes } from '@framework/router'
 
+import { fourOhFour } from './middlewares/404.js'
 import { render } from './render.js'
-import { send404 } from './utils/send404.js'
 
 export async function runServer() {
   const app = express()
@@ -29,7 +29,7 @@ export async function runServer() {
     })
   })
 
-  app.use(send404)
+  app.use(fourOhFour)
 
   const port = config.port || 3000
   const server = createServer(app)
