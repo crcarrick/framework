@@ -113,6 +113,10 @@ function extractPageManifest({ outputs = {} }: Metafile) {
   }, {})
 }
 
+function _extractTypings(_metafile: Metafile) {
+  // TODO: Create typings for each route
+}
+
 export const FrameworkPlugin: Plugin = {
   name: 'FrameworkPlugin',
   setup(build) {
