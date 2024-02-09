@@ -102,7 +102,7 @@ function extractPageManifest({ outputs = {} }: Metafile) {
         acc[routePath][name] = {
           exports: filterExports(name, output.exports),
           imports: {
-            client: join('/public', relPath),
+            client: join('/public', 'pages', relPath),
             server: join(cwd(), path),
           },
         }
@@ -119,7 +119,6 @@ export const FrameworkPlugin: Plugin = {
     build.onEnd(async (result) => {
       if (result.metafile) {
         const manifest = extractPageManifest(result.metafile)
-        console.log(JSON.stringify(manifest, null, 2))
         await writeFile(
           join('.framework', 'page-manifest.json'),
           JSON.stringify(manifest, null, 2),

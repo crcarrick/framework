@@ -25,7 +25,7 @@ function isJsConfig(obj: unknown): obj is Config | (() => Config) {
   return isConfig(typeof obj === 'function' ? obj() : obj)
 }
 
-export async function findConfig(): Promise<string> {
+async function findConfig(): Promise<string> {
   const root = await findUp([
     'framework.config.js',
     'framework.config.cjs',
@@ -41,7 +41,8 @@ export async function findConfig(): Promise<string> {
 
 const require = createRequire(import.meta.url)
 
-export async function loadConfig(root: string): Promise<Config> {
+export async function loadConfig(): Promise<Config> {
+  const root = await findConfig()
   const parsed = parse(root)
   const config = require(root) as Config | (() => Config)
 
