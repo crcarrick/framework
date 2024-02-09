@@ -5,15 +5,15 @@ import process from 'node:process'
 import esbuild, { type BuildOptions } from 'esbuild'
 import nodemon from 'nodemon'
 
-import { FrameworkPlugin } from '@framework/build'
-import { walk } from '@framework/utils'
+import {
+  FrameworkPlugin,
+  createTempEntries,
+  // deleteTempEntries,
+  getPageEntryPoints,
+  // type EntryPoints,
+} from '@framework/build'
 
 import { registerSignals } from './utils/registerSignals.js'
-
-interface EntryPoint {
-  in: string
-  out: string
-}
 
 type Command = 'dev' | 'start' | 'build' | 'debug'
 
@@ -26,43 +26,16 @@ function isCommand(command: string): command is Command {
   )
 }
 
-async function getEntryPoints(
-  initialEntryPoints: EntryPoint[],
-): Promise<EntryPoint[]> {
-  const pages = join(process.cwd(), 'src', 'pages')
-  const files: EntryPoint[] = [...initialEntryPoints]
-
-  const walker = walk(pages, { match: /\.(js|ts)x?$/, ignore: /node_modules/ })
-  for await (const file of walker) {
-    const { name } = parse(file.full)
-    files.push({
-      in: file.full,
-      out: join('pages', file.base, name),
-    })
-  }
-
-  return files
+const BOOTSTRAP_ENTRY = {
+  in: join(
+    parse(createRequire(import.meta.url).resolve('@framework/server')).dir,
+    'bootstrap.js',
+  ),
+  out: 'bootstrap',
 }
-
-function getClientEntryPoints() {
-  return getEntryPoints([
-    {
-      in: join(
-        parse(createRequire(import.meta.url).resolve('@framework/server')).dir,
-        'bootstrap.js',
-      ),
-      out: 'bootstrap',
-    },
-  ])
-}
-
-function getServerEntryPoints() {
-  return getEntryPoints([
-    {
-      in: createRequire(import.meta.url).resolve('@framework/server'),
-      out: 'index',
-    },
-  ])
+const SERVER_ENTRY = {
+  in: createRequire(import.meta.url).resolve('@framework/server'),
+  out: 'index',
 }
 
 const BASE_OPTIONS: BuildOptions = {
@@ -76,15 +49,21 @@ const BASE_OPTIONS: BuildOptions = {
 }
 
 async function getClientOptions(): Promise<BuildOptions> {
+  const entries = await createTempEntries()
+  const entryPoints = [...getPageEntryPoints(entries), BOOTSTRAP_ENTRY]
+
   return {
     ...BASE_OPTIONS,
     platform: 'browser',
     outdir: join('.framework', 'public'),
-    entryPoints: await getClientEntryPoints(),
+    entryPoints,
   }
 }
 
 async function getServerOptions(): Promise<BuildOptions> {
+  const entries = await createTempEntries()
+  const entryPoints = [...getPageEntryPoints(entries), SERVER_ENTRY]
+
   return {
     ...BASE_OPTIONS,
     plugins: [FrameworkPlugin],
@@ -92,7 +71,7 @@ async function getServerOptions(): Promise<BuildOptions> {
     platform: 'node',
     packages: 'external',
     outdir: join('.framework', 'server'),
-    entryPoints: await getServerEntryPoints(),
+    entryPoints,
   }
 }
 

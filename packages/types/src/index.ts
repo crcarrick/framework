@@ -36,3 +36,7 @@ export interface Metadata {
 export interface GenerateMetadata<T> {
   (props: ServerSideProps<T>): Metadata | Promise<Metadata>
 }
+
+export type Prettify<T> = {
+  [K in keyof T]: T[K]
+} & {}
