@@ -7,10 +7,11 @@ import nodemon from 'nodemon'
 
 import {
   FrameworkPlugin,
+  copySourceFiles,
   createTempEntries,
   // deleteTempEntries,
   getPageEntryPoints,
-  // type EntryPoints,
+  type EntryPoints,
 } from '@framework/build'
 
 import { registerSignals } from './utils/registerSignals.js'
@@ -48,22 +49,16 @@ const BASE_OPTIONS: BuildOptions = {
   },
 }
 
-async function getClientOptions(): Promise<BuildOptions> {
-  const entries = await createTempEntries()
-  const entryPoints = [...getPageEntryPoints(entries), BOOTSTRAP_ENTRY]
-
+function getClientOptions(entryPoints: EntryPoints): BuildOptions {
   return {
     ...BASE_OPTIONS,
     platform: 'browser',
     outdir: join('.framework', 'public'),
-    entryPoints,
+    entryPoints: [...entryPoints, BOOTSTRAP_ENTRY],
   }
 }
 
-async function getServerOptions(): Promise<BuildOptions> {
-  const entries = await createTempEntries()
-  const entryPoints = [...getPageEntryPoints(entries), SERVER_ENTRY]
-
+function getServerOptions(entryPoints: EntryPoints): BuildOptions {
   return {
     ...BASE_OPTIONS,
     plugins: [FrameworkPlugin],
@@ -71,29 +66,36 @@ async function getServerOptions(): Promise<BuildOptions> {
     platform: 'node',
     packages: 'external',
     outdir: join('.framework', 'server'),
-    entryPoints,
+    entryPoints: [...entryPoints, SERVER_ENTRY],
   }
 }
 
-async function buildClient() {
-  const options = await getClientOptions()
+async function buildClient(entryPoints: EntryPoints) {
+  const options = getClientOptions(entryPoints)
 
   return esbuild.build(options)
 }
 
-async function buildServer() {
-  const options = await getServerOptions()
+async function buildServer(entryPoints: EntryPoints) {
+  const options = getServerOptions(entryPoints)
 
   return esbuild.build(options)
 }
 
 async function build() {
-  await Promise.all([buildClient(), buildServer()])
+  await copySourceFiles()
+  const entries = await createTempEntries()
+  const entryPoints = getPageEntryPoints(entries)
+
+  await Promise.all([buildClient(entryPoints), buildServer(entryPoints)])
 }
 
 async function devServer(debug = false) {
-  const clientOptions = await getClientOptions()
-  const serverOptions = await getServerOptions()
+  await copySourceFiles()
+  const tempEntries = await createTempEntries()
+  const entryPoints = getPageEntryPoints(tempEntries)
+  const clientOptions = getClientOptions(entryPoints)
+  const serverOptions = getServerOptions(entryPoints)
   const clientContext = await esbuild.context(clientOptions)
   const serverContext = await esbuild.context(serverOptions)
 

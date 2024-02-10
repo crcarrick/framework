@@ -16,7 +16,7 @@ const COMPONENT_MAP: Record<string, string> = {
 }
 
 export async function createTempEntries() {
-  const pages = join(cwd(), 'src', 'pages')
+  const pages = join(cwd(), '.framework', 'temp', 'pages')
   const dirents = await readdir(pages, { recursive: true, withFileTypes: true })
   const outputs: Record<string, string[]> = {}
 

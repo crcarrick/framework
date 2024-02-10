@@ -5,8 +5,8 @@ import type { Metadata } from '@framework/types'
 import { SSRShell } from './SSRShell.js'
 
 interface AppProps {
-  layout: ComponentType<PropsWithChildren> | null
   page: ComponentType
+  layout: ComponentType<PropsWithChildren> | undefined
   metadata: Metadata
 }
 

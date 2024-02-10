@@ -5,35 +5,15 @@ import type { Metafile } from 'esbuild'
 
 import {
   isValidPageComponent,
+  pageComponentExportSet,
   type Page,
-  type PageComponent,
   type PageComponentExport,
   type PageManifest,
 } from '../types.js'
 
-function filterExports(
-  key: PageComponent,
-  exports: string[],
-): PageComponentExport[] {
+function filterExports(exports: string[]): PageComponentExport[] {
   return exports.filter((exp): exp is PageComponentExport => {
-    if (exp === 'default') {
-      return true
-    }
-
-    switch (key) {
-      case 'page': {
-        return ['getServerSideProps', 'getStaticProps'].includes(exp)
-      }
-
-      case 'layout': {
-        return ['metadata', 'generateMetadata'].includes(exp)
-      }
-
-      case 'fallback':
-      default: {
-        return false
-      }
-    }
+    return pageComponentExportSet.has(exp as PageComponentExport)
   })
 }
 
@@ -57,8 +37,7 @@ function convertParams(path: string) {
     .join(sep)
 }
 
-const PAGE_REGEX =
-  /.*\.framework\/server\/pages\/(.*(page|layout|fallback)-(.*)\.js)/
+const PAGE_REGEX = /.*\.framework\/server\/pages\/(.*page\.js)/
 
 export function extractPageManifest({ outputs = {} }: Metafile) {
   return Object.entries(outputs).reduce<PageManifest>((acc, [path, output]) => {
@@ -66,15 +45,15 @@ export function extractPageManifest({ outputs = {} }: Metafile) {
 
     if (match !== null) {
       const [, relPath] = match
-      const { dir, name } = parse(relPath)
-      const routePath = dir === '' ? '/' : dir
+      const { dir } = parse(relPath)
+      const routePath = join('/', dir)
 
-      if (isValidPageComponent(name, output.exports)) {
+      if (isValidPageComponent(output.exports)) {
         acc[routePath] ??= {} as Page
         acc[routePath].route = routePath
         acc[routePath].match = convertParams(routePath)
-        acc[routePath][name] = {
-          exports: filterExports(name, output.exports),
+        acc[routePath].page = {
+          exports: filterExports(output.exports),
           imports: {
             client: join('/public', 'pages', relPath),
             server: join(cwd(), path),

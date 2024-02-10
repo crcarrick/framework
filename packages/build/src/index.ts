@@ -1,4 +1,5 @@
 export { FrameworkPlugin } from './plugin.js'
+export { copySourceFiles } from './utils/copySourceFiles.js'
 export {
   createTempEntries,
   type TempEntry,
@@ -11,7 +12,6 @@ export {
 
 export type {
   Page,
-  PageComponent,
   PageComponentExport,
   PageManifest,
   PageOut,

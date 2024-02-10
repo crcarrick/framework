@@ -8,10 +8,10 @@ import type { TempEntry } from './createTempEntries.js'
 export type EntryPoints = Extract<BuildOptions['entryPoints'], Array<object>>
 
 export function getPageEntryPoints(tempEntries: TempEntry[]): EntryPoints {
-  const pages = join(cwd(), 'src', 'pages')
+  const pages = join(cwd(), '.framework', 'temp', 'pages')
 
   return tempEntries.map(({ path }) => ({
     in: join(path, 'entry.tsx'),
-    out: join(relative(pages, path), 'page'),
+    out: join('pages', relative(pages, path), 'page'),
   }))
 }

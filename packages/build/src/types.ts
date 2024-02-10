@@ -1,12 +1,15 @@
-import type { Prettify } from '@framework/types'
+export const pageComponentExportSet = new Set([
+  'Page',
+  'Layout',
+  'Fallback',
+  'getServerSideProps',
+  'getStaticProps',
+  'metadata',
+  'generateMetadata',
+] as const)
 
-export type PageComponent = 'page' | 'layout' | 'fallback'
 export type PageComponentExport =
-  | 'default'
-  | 'getServerSideProps'
-  | 'getStaticProps'
-  | 'metadata'
-  | 'generateMetadata'
+  typeof pageComponentExportSet extends Set<infer T> ? T : never
 export interface PageOut {
   exports: PageComponentExport[]
   imports: {
@@ -14,23 +17,15 @@ export interface PageOut {
     server: string
   }
 }
-export type Page = Prettify<
-  Record<PageComponent, PageOut> & {
-    route: string
-    match: string
-  }
->
+export type Page = {
+  page: PageOut
+  route: string
+  match: string
+}
 export interface PageManifest {
   [routePath: string]: Page
 }
 
-function isPageComponent(key: string) {
-  return ['page', 'layout', 'fallback'].includes(key)
-}
-
-export function isValidPageComponent(
-  key: string,
-  exports: string[],
-): key is PageComponent {
-  return isPageComponent(key) && exports.includes('default')
+export function isValidPageComponent(exports: string[]) {
+  return exports.some((exp) => exp === 'Page' || exp === 'Layout')
 }
