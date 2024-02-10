@@ -7,9 +7,6 @@ import nodemon from 'nodemon'
 
 import {
   FrameworkPlugin,
-  copySourceFiles,
-  createTempEntries,
-  // deleteTempEntries,
   getPageEntryPoints,
   type EntryPoints,
 } from '@framework/build'
@@ -83,17 +80,14 @@ async function buildServer(entryPoints: EntryPoints) {
 }
 
 async function build() {
-  await copySourceFiles()
-  const entries = await createTempEntries()
-  const entryPoints = getPageEntryPoints(entries)
+  const entryPoints = await getPageEntryPoints()
 
   await Promise.all([buildClient(entryPoints), buildServer(entryPoints)])
 }
 
 async function devServer(debug = false) {
-  await copySourceFiles()
-  const tempEntries = await createTempEntries()
-  const entryPoints = getPageEntryPoints(tempEntries)
+  const entryPoints = await getPageEntryPoints()
+
   const clientOptions = getClientOptions(entryPoints)
   const serverOptions = getServerOptions(entryPoints)
   const clientContext = await esbuild.context(clientOptions)
