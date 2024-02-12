@@ -49,6 +49,7 @@ const BASE_OPTIONS: BuildOptions = {
 function getClientOptions(entryPoints: EntryPoints): BuildOptions {
   return {
     ...BASE_OPTIONS,
+    plugins: [FrameworkPlugin],
     platform: 'browser',
     outdir: join('.framework', 'public'),
     entryPoints: [...entryPoints, BOOTSTRAP_ENTRY],

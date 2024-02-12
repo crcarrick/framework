@@ -7,10 +7,6 @@ import type { BuildOptions } from 'esbuild'
 export type EntryPoints = Extract<BuildOptions['entryPoints'], Array<object>>
 export type EntryPoint = EntryPoints[number]
 
-function replace(path: string) {
-  return path.replace('src', join('.framework', 'temp'))
-}
-
 export async function getPageEntryPoints(): Promise<EntryPoints> {
   const pages = join(cwd(), 'src', 'pages')
   const files = await readdir(pages, { recursive: true, withFileTypes: true })
@@ -22,15 +18,16 @@ export async function getPageEntryPoints(): Promise<EntryPoints> {
     return acc
   }, [])
 
-  const entryMap: Record<string, EntryPoint> = {}
+  const entryPoints: EntryPoints = []
 
   for (const path of paths) {
     const { dir } = parse(path)
-    entryMap[dir] = {
-      in: replace(join(dir, 'entry.tsx')),
-      out: replace(join('pages', relative(pages, dir), 'page')),
-    }
+    entryPoints.push({
+      // should probably handle other file extensions
+      in: path,
+      out: join('pages', relative(pages, dir), 'page'),
+    })
   }
 
-  return Object.values(entryMap)
+  return entryPoints
 }

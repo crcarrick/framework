@@ -14,7 +14,7 @@
   "type": "module",
   "scripts": {
     "build": "pnpm clean && tsc -p tsconfig.build.json",
-    "clean": "rimraf ./bin && rimraf tsconfig.build.tsbuildinfo",
+    "clean": "rimraf ./dist && rimraf tsconfig.build.tsbuildinfo",
     "tests": "",
     "watch": "pnpm clean && tsc -p tsconfig.build.json --watch",
     "prepublishOnly": "pnpm build"

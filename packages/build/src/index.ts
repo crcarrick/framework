@@ -1,10 +1,4 @@
 export { FrameworkPlugin } from './plugin.js'
-export { copySourceFiles } from './utils/copySourceFiles.js'
-export {
-  createTempEntries,
-  type TempEntry,
-} from './entrypoints/createTempEntries.js'
-export { deleteTempEntries } from './entrypoints/deleteTempEntries.js'
 export {
   getPageEntryPoints,
   type EntryPoints,
