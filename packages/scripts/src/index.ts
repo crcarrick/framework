@@ -1,3 +1,4 @@
+import { readdir } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import { join, parse, relative } from 'node:path'
 import process from 'node:process'
@@ -6,7 +7,6 @@ import esbuild, { type BuildOptions } from 'esbuild'
 import nodemon from 'nodemon'
 
 import { FrameworkPlugin } from '@framework/build'
-import { walk } from '@framework/utils'
 
 import { registerSignals } from './utils/registerSignals.js'
 
@@ -30,18 +30,19 @@ async function getEntryPoints(
   initialEntryPoints: EntryPoint[],
 ): Promise<EntryPoint[]> {
   const pages = join(process.cwd(), 'src', 'pages')
-  const files: EntryPoint[] = [...initialEntryPoints]
+  const files = await readdir(pages, { recursive: true, withFileTypes: true })
+  const entries = files.reduce<EntryPoint[]>((acc, file) => {
+    if (file.isFile() && /page\.(js|ts|jsx|tsx)$/.test(file.name)) {
+      acc.push({
+        in: join(file.path, `entry.tsx`),
+        out: join('pages', relative(pages, file.path), 'page'),
+      })
+    }
 
-  const walker = walk(pages, { match: /\.(js|ts)x?$/, ignore: /node_modules/ })
-  for await (const file of walker) {
-    const { name } = parse(file.full)
-    files.push({
-      in: file.full,
-      out: join('pages', file.base, name),
-    })
-  }
+    return acc
+  }, [])
 
-  return files
+  return entries.concat(initialEntryPoints)
 }
 
 function getClientEntryPoints() {
@@ -78,6 +79,7 @@ const BASE_OPTIONS: BuildOptions = {
 async function getClientOptions(): Promise<BuildOptions> {
   return {
     ...BASE_OPTIONS,
+    plugins: [FrameworkPlugin],
     platform: 'browser',
     outdir: join('.framework', 'public'),
     entryPoints: await getClientEntryPoints(),

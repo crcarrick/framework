@@ -2,7 +2,7 @@ import {
   Suspense,
   type ComponentProps,
   type ComponentType,
-  type ReactNode,
+  type PropsWithChildren,
 } from 'react'
 import { hydrateRoot } from 'react-dom/client'
 
@@ -19,10 +19,16 @@ declare global {
 }
 
 async function importComponent(path: string) {
-  const module = (await import(path)) as {
-    default: ComponentType<{ children?: ReactNode }>
+  const { Page, Layout, Fallback } = (await import(path)) as {
+    Page: ComponentType<PropsWithChildren<{}>>
+    Layout: ComponentType<PropsWithChildren<{}>>
+    Fallback: ComponentType<PropsWithChildren<{}>>
   }
-  return module.default
+  return {
+    Page,
+    Layout,
+    Fallback,
+  }
 }
 
 async function resource() {
@@ -37,15 +43,8 @@ async function resource() {
   })
 }
 
-async function renderComponent({
-  page,
-  layout,
-  fallback,
-  metadata,
-}: SSRRepresentation) {
-  const Page = await importComponent(page.type)
-  const Layout = layout ? await importComponent(layout.type) : null
-  const Fallback = fallback ? await importComponent(fallback.type) : null
+async function renderComponent({ page, metadata }: SSRRepresentation) {
+  const { Page, Layout, Fallback } = await importComponent(page.type)
   const appProps: ComponentProps<typeof App> = {
     metadata,
     layout: Layout,

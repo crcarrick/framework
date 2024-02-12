@@ -1,125 +1,47 @@
 import { writeFile } from 'node:fs/promises'
-import { join, parse, sep } from 'node:path'
-import { cwd } from 'node:process'
+import { join, parse } from 'node:path'
 
-import type { Plugin, Metafile } from 'esbuild'
+import type { Plugin } from 'esbuild'
 
-const PAGE_REGEX = /.*\.framework\/server\/pages(\/.*)/
-
-type PageComponent = 'page' | 'layout' | 'fallback'
-type PageComponentExport =
-  | 'default'
-  | 'getServerSideProps'
-  | 'getStaticProps'
-  | 'metadata'
-  | 'generateMetadata'
-interface PageOut {
-  exports: PageComponentExport[]
-  imports: {
-    client: string
-    server: string
-  }
-}
-export interface Page extends Partial<Record<PageComponent, PageOut>> {
-  route: string
-  match: string
-}
-
-function isPageComponent(key: string) {
-  return ['page', 'layout', 'fallback'].includes(key)
-}
-
-function isValidPageComponent(
-  key: string,
-  exports: string[],
-): key is PageComponent {
-  return isPageComponent(key) && exports.includes('default')
-}
-
-function filterExports(
-  key: PageComponent,
-  exports: string[],
-): PageComponentExport[] {
-  return exports.filter((exp): exp is PageComponentExport => {
-    if (exp === 'default') {
-      return true
-    }
-
-    switch (key) {
-      case 'page': {
-        return ['getServerSideProps', 'getStaticProps'].includes(exp)
-      }
-
-      case 'layout': {
-        return ['metadata', 'generateMetadata'].includes(exp)
-      }
-
-      case 'fallback':
-      default: {
-        return false
-      }
-    }
-  })
-}
-
-export interface PageManifest {
-  [routePath: string]: Page
-}
-
-function isParamSegment(segment: string) {
-  return (
-    segment.startsWith('[') &&
-    segment.endsWith(']') &&
-    !segment.slice(1, -1).includes('[') &&
-    !segment.slice(1, -1).includes(']')
-  )
-}
-
-function convertParams(path: string) {
-  return path
-    .split(sep)
-    .map((segment) =>
-      isParamSegment(segment)
-        ? segment.replace(/\[(.*?)\]/, (_match, param) => `:${param}`)
-        : segment,
-    )
-    .join(sep)
-}
-
-function extractPageManifest({ outputs = {} }: Metafile) {
-  return Object.entries(outputs).reduce<PageManifest>((acc, [path, output]) => {
-    const match = path.match(PAGE_REGEX)
-
-    if (match !== null) {
-      const [, relPath] = match
-      const { dir, name } = parse(relPath)
-      const routePath = dir === '' ? '/' : dir
-
-      if (isValidPageComponent(name, output.exports)) {
-        acc[routePath] ??= {} as Page
-        acc[routePath].route = routePath
-        acc[routePath].match = convertParams(routePath)
-        acc[routePath][name] = {
-          exports: filterExports(name, output.exports),
-          imports: {
-            client: join('/public', 'pages', relPath),
-            server: join(cwd(), path),
-          },
-        }
-      }
-    }
-
-    return acc
-  }, {})
-}
-
-function _extractTypings(_metafile: Metafile) {
-  // TODO: Create typings for each route
-}
+import { extractPageManifest } from './extractors/extractPageManifest.js'
+import { getPageComponents } from './utils/getPageComponents.js'
 
 export const FrameworkPlugin: Plugin = {
   name: 'FrameworkPlugin',
   setup(build) {
+    const COMPONENTS = {
+      page: 'Page',
+      layout: 'Layout',
+      fallback: 'Fallback',
+    }
+
+    build.onResolve({ filter: /entry\.(js|ts|jsx|tsx)$/ }, (args) => {
+      const { dir, ext } = parse(args.path)
+
+      return {
+        path: args.path,
+        namespace: 'framework',
+        watchFiles: ['page', 'layout', 'fallback'].map((component) =>
+          join(dir, `${component}${ext}`),
+        ),
+      }
+    })
+
+    build.onLoad({ filter: /.*/, namespace: 'framework' }, async (args) => {
+      const { dir, ext } = parse(args.path)
+      const components = await getPageComponents(dir)
+      const contents = components.reduce((content, component) => {
+        return `${content}\nexport * from './${component}.js'\nexport { default as ${COMPONENTS[component]} } from './${component}.js'`
+      }, ``)
+      const loader = ext.includes('ts') ? 'tsx' : 'jsx'
+
+      return {
+        loader,
+        contents,
+        resolveDir: dir,
+      }
+    })
+
     build.onEnd(async (result) => {
       if (result.metafile) {
         const manifest = extractPageManifest(result.metafile)

@@ -10,8 +10,6 @@ export interface SSRComponent {
 
 export interface SSRRepresentation {
   page: SSRComponent
-  layout: SSRComponent | null
-  fallback: SSRComponent | null
   metadata: Metadata
 }
 
@@ -34,18 +32,6 @@ export function toSSRRepresentation<T extends object = {}>(
   representation.page ??= {} as SSRComponent
   representation.page.type = toType(route.page.imports.client)
   representation.page.props = pageProps
-
-  if (route.layout) {
-    representation.layout ??= {} as SSRComponent
-    representation.layout.type = toType(route.layout.imports.client)
-    representation.layout.props = {}
-  }
-
-  if (route.fallback) {
-    representation.fallback ??= {} as SSRComponent
-    representation.fallback.type = toType(route.fallback.imports.client)
-    representation.fallback.props = {}
-  }
 
   return JSON.stringify(representation)
 }
