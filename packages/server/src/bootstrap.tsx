@@ -60,11 +60,7 @@ async function renderComponent({ page, metadata }: SSRRepresentation) {
   const layouts = await importLayouts(page.layouts)
   const appProps: ComponentProps<typeof App> = {
     metadata,
-    layout: ({ children }: PropsWithChildren<{}>) => {
-      return layouts.reduceRight((acc, Layout) => {
-        return Layout ? <Layout>{acc}</Layout> : acc
-      }, children)
-    },
+    layouts,
     page: () => (
       <Suspense fallback={Fallback ? <Fallback /> : <Loading />}>
         <GSSPResolver resource={resource()}>

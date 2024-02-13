@@ -23,7 +23,7 @@ interface ImportedPageComponent<T = {}> {
 
 export interface ImportedRoute<T = {}> {
   page: ImportedPageComponent<T>
-  layouts: ImportedRouteComponent[]
+  layouts: Array<ComponentType<PropsWithChildren<{}>>>
   fallback: ImportedRouteComponent
 }
 
@@ -47,10 +47,10 @@ export async function importPage(
   const Page = pageModule?.Page ?? null
   const Fallback = pageModule?.Fallback ?? null
 
-  const layouts: ImportedRouteComponent[] = []
+  const layouts: Array<ComponentType<PropsWithChildren<{}>>> = []
   for (const layout of page.layouts) {
     const layoutModule = (await import(layout.server)) as RouteImport
-    layouts.push({ Component: layoutModule.Layout })
+    layouts.push(layoutModule.Layout)
   }
 
   if (
