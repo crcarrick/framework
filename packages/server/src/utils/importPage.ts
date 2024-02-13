@@ -48,9 +48,25 @@ export async function importPage(
   const Fallback = pageModule?.Fallback ?? null
 
   const layouts: Array<ComponentType<PropsWithChildren<{}>>> = []
+  let metadata: Metadata = {}
   for (const layout of page.layouts) {
     const layoutModule = (await import(layout.server)) as RouteImport
     layouts.push(layoutModule.Layout)
+    if (layoutModule.generateMetadata) {
+      const resolvedMetadata = await Promise.resolve(
+        layoutModule.generateMetadata({ params }),
+      )
+
+      metadata = {
+        ...metadata,
+        ...resolvedMetadata,
+      }
+    } else if (layoutModule.metadata) {
+      metadata = {
+        ...metadata,
+        ...layoutModule.metadata,
+      }
+    }
   }
 
   if (
@@ -61,11 +77,6 @@ export async function importPage(
       `Route ${route} has both a \`generateMetadata\` and a \`metadata\` export. Using \`generateMetadata\`.`,
     )
   }
-
-  const metadata: Metadata =
-    pageModule && pageModule.generateMetadata !== undefined
-      ? await Promise.resolve(pageModule.generateMetadata({ params }))
-      : pageModule?.metadata ?? {}
 
   // what is `cache()` actually doing for us here?
   const loader = cache(() =>
