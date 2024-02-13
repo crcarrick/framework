@@ -1,16 +1,9 @@
-import { join, parse, relative } from 'node:path'
+import { join, relative } from 'node:path'
 import process from 'node:process'
 
-import esbuild, { type BuildOptions } from 'esbuild'
 import nodemon from 'nodemon'
 
-import {
-  FrameworkPlugin,
-  getEntryPoints,
-  type EntryPoint,
-} from '@framework/build'
-
-import { registerSignals } from './utils/registerSignals.js'
+import { build, watch } from '@framework/build'
 
 type Command = 'dev' | 'start' | 'build' | 'debug'
 
@@ -23,86 +16,14 @@ function isCommand(command: string): command is Command {
   )
 }
 
-const SERVER_ROOT = new URL(import.meta.resolve('@framework/server')).pathname
-
-const BOOTSTRAP_ENTRY_POINT: EntryPoint = {
-  in: join(parse(SERVER_ROOT).dir, 'bootstrap.js'),
-  out: 'bootstrap',
-}
-const SERVER_ENTRY_POINT: EntryPoint = {
-  in: SERVER_ROOT,
-  out: 'index',
-}
-
-const BASE_OPTIONS: BuildOptions = {
-  bundle: true,
-  format: 'esm',
-  splitting: true,
-  plugins: [FrameworkPlugin],
-  loader: {
-    '.js': 'jsx',
-    '.ts': 'tsx',
-  },
-}
-
-const CLIENT_OPTIONS: BuildOptions = {
-  ...BASE_OPTIONS,
-  platform: 'browser',
-  outdir: join('.framework', 'public'),
-}
-const SERVER_OPTIONS: BuildOptions = {
-  ...BASE_OPTIONS,
-  metafile: true,
-  platform: 'node',
-  packages: 'external',
-  outdir: join('.framework', 'server'),
-}
-
-async function buildClient(entryPoints: EntryPoint[]) {
-  return esbuild.build({
-    ...CLIENT_OPTIONS,
-    entryPoints: entryPoints.concat([BOOTSTRAP_ENTRY_POINT]),
-  })
-}
-
-async function buildServer(entryPoints: EntryPoint[]) {
-  return esbuild.build({
-    ...SERVER_OPTIONS,
-    entryPoints: entryPoints.concat([SERVER_ENTRY_POINT]),
-  })
-}
-
-async function build() {
-  const entryPoints = await getEntryPoints()
-
-  await Promise.all([buildClient(entryPoints), buildServer(entryPoints)])
-}
-
 interface DevServerOptions {
   debug?: boolean
 }
 
 async function devServer({ debug }: DevServerOptions = {}) {
-  const entryPoints = await getEntryPoints()
-  const clientContext = await esbuild.context({
-    ...CLIENT_OPTIONS,
-    entryPoints: entryPoints.concat([BOOTSTRAP_ENTRY_POINT]),
-  })
-  const serverContext = await esbuild.context({
-    ...SERVER_OPTIONS,
-    entryPoints: entryPoints.concat([SERVER_ENTRY_POINT]),
-  })
+  await watch()
 
-  registerSignals(() => {
-    Promise.all([clientContext.dispose(), serverContext.dispose()]).then(
-      () => process.exit(0),
-      () => process.exit(1),
-    )
-  })
-
-  await Promise.all([clientContext.watch(), serverContext.watch()])
-
-  const watch = [
+  const files = [
     'src/**/*',
     'framework.config.js',
     'framework.config.cjs',
@@ -110,8 +31,8 @@ async function devServer({ debug }: DevServerOptions = {}) {
   ]
   // FIXME: little hack to help me while i'm developing this thing
   if (debug) {
-    watch.push('.framework/server/index.js')
-    watch.push('.framework/public/bootstrap.js')
+    files.push('.framework/server/index.js')
+    files.push('.framework/public/bootstrap.js')
   }
 
   const server = nodemon({
@@ -120,7 +41,7 @@ async function devServer({ debug }: DevServerOptions = {}) {
     script: join('.framework', 'server', 'index.js'),
     ignore: ['node_modules'],
     nodeArgs: ['--no-warnings'],
-    watch,
+    watch: files,
   })
 
   server.on('restart', (allFiles) => {

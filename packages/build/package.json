@@ -20,9 +20,11 @@
     "prepublishOnly": "pnpm build"
   },
   "peerDependencies": {
+    "@framework/utils": "workspace:^",
     "esbuild": "^0.20.0"
   },
   "devDependencies": {
+    "@framework/utils": "workspace:^",
     "esbuild": "^0.20.0",
     "typescript": "^5.3.3"
   }

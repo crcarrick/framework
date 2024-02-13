@@ -3,8 +3,8 @@ import { join, parse } from 'node:path'
 
 import type { Plugin } from 'esbuild'
 
-import { extractPageManifest } from './extractors/extractPageManifest.js'
-import { getPageComponents } from './utils/getPageComponents.js'
+import { extractPageManifest } from '../extractors/extractPageManifest.js'
+import { getPageComponents } from '../utils/getPageComponents.js'
 
 export const FrameworkPlugin: Plugin = {
   name: 'FrameworkPlugin',

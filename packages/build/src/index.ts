@@ -1,3 +1,5 @@
-export { FrameworkPlugin } from './plugin.js'
+export { build, buildClient, buildServer, watch } from './esbuild/build.js'
+export { CLIENT_OPTIONS, SERVER_OPTIONS } from './esbuild/options.js'
+export { FrameworkPlugin } from './esbuild/plugin.js'
 export type { Page, PageManifest } from './extractors/extractPageManifest.js'
 export { getEntryPoints, type EntryPoint } from './utils/getEntryPoints.js'
