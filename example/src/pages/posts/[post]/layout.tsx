@@ -15,5 +15,5 @@ interface PostLayoutProps {
 }
 
 export default function PostLayout({ children }: PostLayoutProps) {
-  return children
+  return <div style={{ backgroundColor: 'red', padding: 10 }}>{children}</div>
 }

@@ -5,5 +5,5 @@ interface PostDetailsLayoutProps {
 export default function PostDetailsLayout({
   children,
 }: PostDetailsLayoutProps) {
-  return children
+  return <div style={{ backgroundColor: 'blue', padding: 10 }}>{children}</div>
 }

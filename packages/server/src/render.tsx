@@ -1,5 +1,5 @@
 import type { Response } from 'express'
-import { Suspense, type ComponentProps } from 'react'
+import { Suspense, type ComponentProps, type PropsWithChildren } from 'react'
 import { renderToPipeableStream } from 'react-dom/server'
 
 import type { Page } from '@framework/build'
@@ -17,10 +17,9 @@ export async function render<T extends object>(
   params: T,
   res: Response,
 ) {
-  const { page, layout, fallback } = await importPage(route, params)
+  const { page, layouts, fallback } = await importPage(route, params)
 
   const Page = page.Component
-  const Layout = layout.Component
   const Fallback = fallback.Component
 
   if (!Page) {
@@ -34,7 +33,11 @@ export async function render<T extends object>(
   const pageProps: ComponentProps<typeof Page> = { params }
   const appProps: ComponentProps<typeof App> = {
     metadata,
-    layout: Layout,
+    layout: ({ children }: PropsWithChildren<{}>) => {
+      return layouts.reduceRight((acc, { Component }) => {
+        return Component ? <Component>{acc}</Component> : acc
+      }, children)
+    },
     page: () => (
       <Suspense fallback={Fallback ? <Fallback /> : <Loading />}>
         <GSSPResolver resource={resource}>

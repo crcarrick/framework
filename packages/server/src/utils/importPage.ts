@@ -23,7 +23,7 @@ interface ImportedPageComponent<T = {}> {
 
 export interface ImportedRoute<T = {}> {
   page: ImportedPageComponent<T>
-  layout: ImportedRouteComponent
+  layouts: ImportedRouteComponent[]
   fallback: ImportedRouteComponent
 }
 
@@ -45,12 +45,17 @@ export async function importPage(
     : null
 
   const Page = pageModule?.Page ?? null
-  const Layout = pageModule?.Layout ?? null
   const Fallback = pageModule?.Fallback ?? null
 
+  const layouts: ImportedRouteComponent[] = []
+  for (const layout of page.layouts) {
+    const layoutModule = (await import(layout.server)) as RouteImport
+    layouts.push({ Component: layoutModule.Layout })
+  }
+
   if (
-    page?.exports.includes('metadata') &&
-    page?.exports.includes('generateMetadata')
+    page.exports.includes('metadata') &&
+    page.exports.includes('generateMetadata')
   ) {
     console.warn(
       `Route ${route} has both a \`generateMetadata\` and a \`metadata\` export. Using \`generateMetadata\`.`,
@@ -71,7 +76,7 @@ export async function importPage(
 
   return {
     page: { Component: Page, loader, metadata },
-    layout: { Component: Layout },
+    layouts,
     fallback: { Component: Fallback },
   }
 }

@@ -6,6 +6,7 @@ import type { Metadata } from '@framework/types'
 export interface SSRComponent {
   type: string
   props: object
+  layouts: string[]
 }
 
 export interface SSRRepresentation {
@@ -32,6 +33,7 @@ export function toSSRRepresentation<T extends object = {}>(
   representation.page ??= {} as SSRComponent
   representation.page.type = toType(route.page.imports.client)
   representation.page.props = pageProps
+  representation.page.layouts = route.page.layouts.map(({ client }) => client)
 
   return JSON.stringify(representation)
 }

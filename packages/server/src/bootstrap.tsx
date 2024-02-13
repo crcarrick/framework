@@ -19,16 +19,28 @@ declare global {
 }
 
 async function importComponent(path: string) {
-  const { Page, Layout, Fallback } = (await import(path)) as {
+  const { Page, Fallback } = (await import(path)) as {
     Page: ComponentType<PropsWithChildren<{}>>
-    Layout: ComponentType<PropsWithChildren<{}>>
     Fallback: ComponentType<PropsWithChildren<{}>>
   }
+
   return {
     Page,
-    Layout,
     Fallback,
   }
+}
+
+async function importLayouts(paths: string[]) {
+  const layouts = await Promise.all(
+    paths.map(
+      (path) =>
+        import(path) as Promise<{
+          Layout: ComponentType<PropsWithChildren<{}>>
+        }>,
+    ),
+  )
+
+  return layouts.map((module) => module.Layout)
 }
 
 async function resource() {
@@ -44,10 +56,15 @@ async function resource() {
 }
 
 async function renderComponent({ page, metadata }: SSRRepresentation) {
-  const { Page, Layout, Fallback } = await importComponent(page.type)
+  const { Page, Fallback } = await importComponent(page.type)
+  const layouts = await importLayouts(page.layouts)
   const appProps: ComponentProps<typeof App> = {
     metadata,
-    layout: Layout,
+    layout: ({ children }: PropsWithChildren<{}>) => {
+      return layouts.reduceRight((acc, Layout) => {
+        return Layout ? <Layout>{acc}</Layout> : acc
+      }, children)
+    },
     page: () => (
       <Suspense fallback={Fallback ? <Fallback /> : <Loading />}>
         <GSSPResolver resource={resource()}>

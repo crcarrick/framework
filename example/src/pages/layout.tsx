@@ -18,5 +18,5 @@ interface RootLayoutProps {
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {
-  return children
+  return <div>{children}</div>
 }
