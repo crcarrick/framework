@@ -1,19 +1,16 @@
-import { readdir } from 'node:fs/promises'
-import { createRequire } from 'node:module'
 import { join, parse, relative } from 'node:path'
 import process from 'node:process'
 
 import esbuild, { type BuildOptions } from 'esbuild'
 import nodemon from 'nodemon'
 
-import { FrameworkPlugin } from '@framework/build'
+import {
+  FrameworkPlugin,
+  getEntryPoints,
+  type EntryPoint,
+} from '@framework/build'
 
 import { registerSignals } from './utils/registerSignals.js'
-
-interface EntryPoint {
-  in: string
-  out: string
-}
 
 type Command = 'dev' | 'start' | 'build' | 'debug'
 
@@ -26,99 +23,75 @@ function isCommand(command: string): command is Command {
   )
 }
 
-async function getEntryPoints(
-  initialEntryPoints: EntryPoint[],
-): Promise<EntryPoint[]> {
-  const pages = join(process.cwd(), 'src', 'pages')
-  const files = await readdir(pages, { recursive: true, withFileTypes: true })
-  const entries = files.reduce<EntryPoint[]>((acc, file) => {
-    if (file.isFile() && /page\.(js|ts|jsx|tsx)$/.test(file.name)) {
-      acc.push({
-        in: join(file.path, `entry.tsx`),
-        out: join('pages', relative(pages, file.path), 'page'),
-      })
-    }
+const SERVER_ROOT = new URL(import.meta.resolve('@framework/server')).pathname
 
-    return acc
-  }, [])
-
-  return entries.concat(initialEntryPoints)
+const BOOTSTRAP_ENTRY_POINT: EntryPoint = {
+  in: join(parse(SERVER_ROOT).dir, 'bootstrap.js'),
+  out: 'bootstrap',
 }
-
-function getClientEntryPoints() {
-  return getEntryPoints([
-    {
-      in: join(
-        parse(createRequire(import.meta.url).resolve('@framework/server')).dir,
-        'bootstrap.js',
-      ),
-      out: 'bootstrap',
-    },
-  ])
-}
-
-function getServerEntryPoints() {
-  return getEntryPoints([
-    {
-      in: createRequire(import.meta.url).resolve('@framework/server'),
-      out: 'index',
-    },
-  ])
+const SERVER_ENTRY_POINT: EntryPoint = {
+  in: SERVER_ROOT,
+  out: 'index',
 }
 
 const BASE_OPTIONS: BuildOptions = {
   bundle: true,
   format: 'esm',
   splitting: true,
+  plugins: [FrameworkPlugin],
   loader: {
     '.js': 'jsx',
     '.ts': 'tsx',
   },
 }
 
-async function getClientOptions(): Promise<BuildOptions> {
-  return {
-    ...BASE_OPTIONS,
-    plugins: [FrameworkPlugin],
-    platform: 'browser',
-    outdir: join('.framework', 'public'),
-    entryPoints: await getClientEntryPoints(),
-  }
+const CLIENT_OPTIONS: BuildOptions = {
+  ...BASE_OPTIONS,
+  platform: 'browser',
+  outdir: join('.framework', 'public'),
+}
+const SERVER_OPTIONS: BuildOptions = {
+  ...BASE_OPTIONS,
+  metafile: true,
+  platform: 'node',
+  packages: 'external',
+  outdir: join('.framework', 'server'),
 }
 
-async function getServerOptions(): Promise<BuildOptions> {
-  return {
-    ...BASE_OPTIONS,
-    plugins: [FrameworkPlugin],
-    metafile: true,
-    platform: 'node',
-    packages: 'external',
-    outdir: join('.framework', 'server'),
-    entryPoints: await getServerEntryPoints(),
-  }
+async function buildClient(entryPoints: EntryPoint[]) {
+  return esbuild.build({
+    ...CLIENT_OPTIONS,
+    entryPoints: entryPoints.concat([BOOTSTRAP_ENTRY_POINT]),
+  })
 }
 
-async function buildClient() {
-  const options = await getClientOptions()
-
-  return esbuild.build(options)
-}
-
-async function buildServer() {
-  const options = await getServerOptions()
-
-  return esbuild.build(options)
+async function buildServer(entryPoints: EntryPoint[]) {
+  return esbuild.build({
+    ...SERVER_OPTIONS,
+    entryPoints: entryPoints.concat([SERVER_ENTRY_POINT]),
+  })
 }
 
 async function build() {
-  await Promise.all([buildClient(), buildServer()])
+  const entryPoints = await getEntryPoints()
+
+  await Promise.all([buildClient(entryPoints), buildServer(entryPoints)])
 }
 
-async function devServer(debug = false) {
-  const clientOptions = await getClientOptions()
-  const serverOptions = await getServerOptions()
-  const clientContext = await esbuild.context(clientOptions)
-  const serverContext = await esbuild.context(serverOptions)
+interface DevServerOptions {
+  debug?: boolean
+}
+
+async function devServer({ debug }: DevServerOptions = {}) {
+  const entryPoints = await getEntryPoints()
+  const clientContext = await esbuild.context({
+    ...CLIENT_OPTIONS,
+    entryPoints: entryPoints.concat([BOOTSTRAP_ENTRY_POINT]),
+  })
+  const serverContext = await esbuild.context({
+    ...SERVER_OPTIONS,
+    entryPoints: entryPoints.concat([SERVER_ENTRY_POINT]),
+  })
 
   registerSignals(() => {
     Promise.all([clientContext.dispose(), serverContext.dispose()]).then(
@@ -195,8 +168,9 @@ async function main() {
     command === 'dev' || command === 'debug' ? 'development' : 'production'
 
   switch (command) {
+    case 'debug':
     case 'dev': {
-      return await devServer()
+      return await devServer({ debug: command === 'debug' })
     }
 
     case 'start': {
@@ -205,10 +179,6 @@ async function main() {
 
     case 'build': {
       return await build()
-    }
-
-    case 'debug': {
-      return await devServer(true)
     }
   }
 }
