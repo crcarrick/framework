@@ -15,8 +15,17 @@ declare global {
   interface Window {
     __SSP: object
     __SSR: SSRRepresentation
+    __SSP_EMITTER: SSPEmitter
   }
 }
+
+class SSPEmitter extends EventTarget {
+  emit() {
+    this.dispatchEvent(new Event('__SSP'))
+  }
+}
+
+window.__SSP_EMITTER = new SSPEmitter()
 
 async function importComponent(path: string) {
   const { Page, Fallback } = (await import(path)) as {
@@ -45,13 +54,7 @@ async function importLayouts(paths: string[]) {
 
 async function resource() {
   return new Promise<Window['__SSP']>((resolve) => {
-    // nice hack
-    const interval = setInterval(() => {
-      if (window.__SSP) {
-        clearInterval(interval)
-        resolve(window.__SSP)
-      }
-    }, 10)
+    window.__SSP_EMITTER.addEventListener('__SSP', () => resolve(window.__SSP))
   })
 }
 

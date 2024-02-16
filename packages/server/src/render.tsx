@@ -45,9 +45,7 @@ export async function render<T extends object>(
 
   const stream = renderToPipeableStream(<App {...appProps} />, {
     bootstrapModules: ['/public/bootstrap.js'],
-    bootstrapScriptContent: `
-        __SSR = ${toSSRRepresentation(route, metadata, pageProps)};
-      `,
+    bootstrapScriptContent: `__SSR = ${toSSRRepresentation(route, metadata, pageProps)};`,
     onShellReady() {
       response.shellReady = true
       res.setHeader('content-type', 'text/html')
