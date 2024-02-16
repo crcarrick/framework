@@ -32,7 +32,10 @@ export class FrameworkResponse<T> extends Writable {
       this._shouldWriteScript = false
       this._writable.write(
         new TextEncoder().encode(
-          `<script>__SSP = ${JSON.stringify(this._promise.value)}</script>`,
+          `<script>
+__SSP = ${JSON.stringify(this._promise.value)}
+if (__SSP_EMITTER) __SSP_EMITTER.emit();
+</script>`,
         ),
       )
     }

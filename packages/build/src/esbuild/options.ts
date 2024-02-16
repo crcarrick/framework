@@ -3,6 +3,8 @@ import { cwd } from 'node:process'
 
 import type { BuildOptions } from 'esbuild'
 
+import type { EntryPoint } from '../utils/getEntryPoints.js'
+
 import { FrameworkPlugin } from './plugin.js'
 
 const BASE_OPTIONS: BuildOptions = {
@@ -28,4 +30,14 @@ export const SERVER_OPTIONS: BuildOptions = {
   platform: 'node',
   packages: 'external',
   outdir: join(cwd(), '.framework', 'server'),
+}
+
+const SERVER_PATH = join('node_modules', '@framework', 'server', 'dist')
+export const SERVER_ENTRY: EntryPoint = {
+  in: join(SERVER_PATH, 'index.js'),
+  out: 'index',
+}
+export const BOOTSTRAP_ENTRY: EntryPoint = {
+  in: join(SERVER_PATH, 'bootstrap.js'),
+  out: 'bootstrap',
 }

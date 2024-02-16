@@ -6,15 +6,15 @@ import type { Plugin } from 'esbuild'
 import { extractPageManifest } from '../extractors/extractPageManifest.js'
 import { getPageComponents } from '../utils/getPageComponents.js'
 
+const COMPONENTS = {
+  page: 'Page',
+  layout: 'Layout',
+  fallback: 'Fallback',
+} as const
+
 export const FrameworkPlugin: Plugin = {
   name: 'FrameworkPlugin',
   setup(build) {
-    const COMPONENTS = {
-      page: 'Page',
-      layout: 'Layout',
-      fallback: 'Fallback',
-    }
-
     build.onResolve({ filter: /entry\.(js|ts|jsx|tsx)$/ }, (args) => {
       const { dir, ext } = parse(args.path)
 
@@ -45,6 +45,10 @@ export const FrameworkPlugin: Plugin = {
     build.onEnd(async (result) => {
       if (result.metafile) {
         const manifest = extractPageManifest(result.metafile)
+        await writeFile(
+          join('.framework', 'metafile.json'),
+          JSON.stringify(result.metafile, null, 2),
+        )
         await writeFile(
           join('.framework', 'page-manifest.json'),
           JSON.stringify(manifest, null, 2),

@@ -96,9 +96,6 @@ importers:
 
   packages/build:
     devDependencies:
-      '@framework/server':
-        specifier: workspace:^
-        version: link:../server
       '@framework/utils':
         specifier: workspace:^
         version: link:../utils
