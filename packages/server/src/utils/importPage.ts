@@ -1,4 +1,4 @@
-import { cache, type ComponentType, type PropsWithChildren } from 'react'
+import { type ComponentType, type PropsWithChildren } from 'react'
 
 import type { Page as Route } from '@framework/build'
 import type {
@@ -78,12 +78,10 @@ export async function importPage(
     )
   }
 
-  // what is `cache()` actually doing for us here?
-  const loader = cache(() =>
+  const loader = () =>
     pageModule && pageModule.getServerSideProps !== undefined
       ? Promise.resolve(pageModule?.getServerSideProps({ params }))
-      : Promise.resolve({}),
-  )
+      : Promise.resolve({})
 
   return {
     page: { Component: Page, loader, metadata },

@@ -46,10 +46,6 @@ export const FrameworkPlugin: Plugin = {
       if (result.metafile) {
         const manifest = extractPageManifest(result.metafile)
         await writeFile(
-          join('.framework', 'metafile.json'),
-          JSON.stringify(result.metafile, null, 2),
-        )
-        await writeFile(
           join('.framework', 'page-manifest.json'),
           JSON.stringify(manifest, null, 2),
         )
