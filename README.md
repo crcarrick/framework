@@ -38,4 +38,5 @@ pnpm debug
 - Server     -- SSR / Suspense stuff is (less, but still) pretty shitty atm
 - Bundle     -- There is a problem where if you export something (metadata, gSSP, etc) from both
                 a page, _and_ a layout or fallback, they all stop working
+- Bundle     -- For now, the project installing `metaframework` still has to install a ton of peer deps
 ```

@@ -1,5 +1,5 @@
 {
-  "name": "@crcarrick/metaframework",
+  "name": "metaframework",
   "version": "0.0.1",
   "description": "Mediocre metaframework clone",
   "author": {
@@ -27,14 +27,6 @@
     "watch": "pnpm clean && tsc -p tsconfig.json --watch",
     "prepublishOnly": "pnpm build"
   },
-  "dependencies": {
-    "compression": "^1.7.4",
-    "esbuild": "^0.20.0",
-    "express": "^5.0.0-beta.1",
-    "find-up": "^7.0.0",
-    "nodemon": "^3.0.3",
-    "path-to-regexp": "^6.2.1"
-  },
   "devDependencies": {
     "@types/compression": "^1.7.5",
     "@types/express": "^4.17.21",
@@ -42,13 +34,23 @@
     "@types/react": "18.2.55",
     "@types/react-dom": "18.2.18",
     "chokidar": "^3.5.3",
+    "compression": "^1.7.4",
     "esbuild": "^0.20.0",
+    "express": "^5.0.0-beta.1",
+    "find-up": "^7.0.0",
     "nodemon": "^3.0.3",
+    "path-to-regexp": "^6.2.1",
     "react": "0.0.0-experimental-2cd19ed1d-20240207",
     "react-dom": "0.0.0-experimental-2cd19ed1d-20240207",
     "typescript": "^5.3.3"
   },
   "peerDependencies": {
+    "compression": "^1.7.4",
+    "esbuild": "^0.20.0",
+    "express": "^5.0.0-beta.1",
+    "find-up": "^7.0.0",
+    "nodemon": "^3.0.3",
+    "path-to-regexp": "^6.2.1",
     "react": "0.0.0-experimental-2cd19ed1d-20240207",
     "react-dom": "0.0.0-experimental-2cd19ed1d-20240207"
   }
