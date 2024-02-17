@@ -6,7 +6,7 @@ module.exports = {
     tsconfigRootDir: __dirname,
     project: [
       './tsconfig.eslint.json',
-      './packages/*/tsconfig.build.json',
+      './packages/*/tsconfig.json',
       './example/tsconfig.json',
     ],
   },
@@ -74,7 +74,7 @@ module.exports = {
       '@typescript/eslint-parser': ['.ts', '.tsx'],
     },
     react: {
-      version: '^18.2.0',
+      version: 'detect',
     },
   },
 }

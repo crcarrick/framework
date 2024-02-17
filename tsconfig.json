@@ -1,11 +1,22 @@
 {
-  "extends": "./tsconfig.build.json",
   "compilerOptions": {
     "baseUrl": ".",
+    "composite": true,
+    "esModuleInterop": true,
+    "incremental": true,
     "jsx": "react-jsx",
-    "noEmit": true,
-    "paths": {
-      "@framework/*": ["*/src"],
-    },
+    "lib": ["es2022", "dom", "dom.iterable"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "target": "esnext",
+    "types": ["react/experimental"],
   },
+  "references": [
+    {
+      "path": "./packages/framework",
+    },
+  ],
 }

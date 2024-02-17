@@ -1,4 +1,4 @@
-import type { Metadata } from '@framework/types'
+import type { Metadata } from 'framework'
 
 export const metadata: Metadata = {
   title: 'Home Page',

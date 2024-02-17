@@ -1,7 +1,4 @@
-import type {
-  GetServerSideProps,
-  FrameworkComponentProps,
-} from '@framework/types'
+import type { GetServerSideProps, FrameworkComponentProps } from 'framework'
 
 import { Header } from '../../../components/Header.js'
 

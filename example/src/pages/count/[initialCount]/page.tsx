@@ -1,6 +1,5 @@
+import type { GetServerSideProps, InferServerSideProps } from 'framework'
 import { useState } from 'react'
-
-import type { GetServerSideProps, InferServerSideProps } from '@framework/types'
 
 interface Params {
   initialCount: string

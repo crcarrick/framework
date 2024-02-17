@@ -18,16 +18,7 @@
     "start": "framework start"
   },
   "dependencies": {
-    "@framework/config": "workspace:^",
-    "@framework/router": "workspace:^",
-    "@framework/scripts": "workspace:^",
-    "@framework/server": "workspace:^",
-    "@framework/types": "workspace:^",
-    "chokidar": "^3.5.3",
-    "compression": "^1.7.4",
-    "express": "^5.0.0-beta.1",
-    "find-up": "^7.0.0",
-    "nodemon": "^3.0.3",
+    "framework": "workspace:*",
     "react": "0.0.0-experimental-2cd19ed1d-20240207",
     "react-dom": "0.0.0-experimental-2cd19ed1d-20240207"
   },
