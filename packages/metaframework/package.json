@@ -1,5 +1,5 @@
 {
-  "name": "metaframework",
+  "name": "@crcarrick/metaframework",
   "version": "0.0.1",
   "description": "Mediocre metaframework clone",
   "author": {
@@ -17,8 +17,7 @@
   },
   "types": "src/index.ts",
   "files": [
-    "bin",
-    "src"
+    "dist"
   ],
   "type": "module",
   "scripts": {
