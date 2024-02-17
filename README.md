@@ -1,4 +1,4 @@
-# Framework 🤷‍♂️
+# Metaframework 🤷‍♂️
 
 [example app](./example)
 
@@ -7,8 +7,8 @@
 #### Setup
 
 ```shell
-git clone git@github.com:crcarrick/framework.git
-cd framework
+git clone git@github.com:crcarrick/metaframework.git
+cd metaframework
 pnpm install
 ```
 

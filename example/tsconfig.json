@@ -1,6 +1,6 @@
 {
   "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["node_modules", ".framework"],
+  "exclude": ["node_modules", ".metaframework"],
   "compilerOptions": {
     "baseUrl": ".",
     "jsx": "react-jsx",

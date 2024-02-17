@@ -47,9 +47,9 @@ importers:
 
   example:
     dependencies:
-      framework:
-        specifier: link:../packages/framework
-        version: link:../packages/framework
+      metaframework:
+        specifier: workspace:*
+        version: link:../packages/metaframework
       react:
         specifier: 0.0.0-experimental-2cd19ed1d-20240207
         version: 0.0.0-experimental-2cd19ed1d-20240207
@@ -67,7 +67,7 @@ importers:
         specifier: ^5.3.3
         version: 5.3.3
 
-  packages/framework:
+  packages/metaframework:
     dependencies:
       compression:
         specifier: ^1.7.4

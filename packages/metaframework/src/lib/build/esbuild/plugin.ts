@@ -20,14 +20,14 @@ export const FrameworkPlugin: Plugin = {
 
       return {
         path: args.path,
-        namespace: 'framework',
+        namespace: 'metaframework',
         watchFiles: ['page', 'layout', 'fallback'].map((component) =>
           join(dir, `${component}${ext}`),
         ),
       }
     })
 
-    build.onLoad({ filter: /.*/, namespace: 'framework' }, async (args) => {
+    build.onLoad({ filter: /.*/, namespace: 'metaframework' }, async (args) => {
       const { dir, ext } = parse(args.path)
       const components = await getPageComponents(dir)
       const contents = components.reduce((content, component) => {
@@ -46,7 +46,7 @@ export const FrameworkPlugin: Plugin = {
       if (result.metafile) {
         const manifest = extractPageManifest(result.metafile)
         await writeFile(
-          join('.framework', 'page-manifest.json'),
+          join('.metaframework', 'page-manifest.json'),
           JSON.stringify(manifest, null, 2),
         )
       }

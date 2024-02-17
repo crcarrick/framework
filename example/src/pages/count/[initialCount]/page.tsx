@@ -1,4 +1,4 @@
-import type { GetServerSideProps, InferServerSideProps } from 'framework'
+import type { GetServerSideProps, InferServerSideProps } from 'metaframework'
 import { useState } from 'react'
 
 interface Params {

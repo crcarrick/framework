@@ -21,7 +21,7 @@ const BASE_OPTIONS: BuildOptions = {
 export const CLIENT_OPTIONS: BuildOptions = {
   ...BASE_OPTIONS,
   platform: 'browser',
-  outdir: join(cwd(), '.framework', 'public'),
+  outdir: join(cwd(), '.metaframework', 'public'),
 }
 
 export const SERVER_OPTIONS: BuildOptions = {
@@ -29,10 +29,16 @@ export const SERVER_OPTIONS: BuildOptions = {
   metafile: true,
   platform: 'node',
   packages: 'external',
-  outdir: join(cwd(), '.framework', 'server'),
+  outdir: join(cwd(), '.metaframework', 'server'),
 }
 
-const SERVER_PATH = join('node_modules', 'framework', 'dist', 'lib', 'server')
+const SERVER_PATH = join(
+  'node_modules',
+  'metaframework',
+  'dist',
+  'lib',
+  'server',
+)
 export const SERVER_ENTRY: EntryPoint = {
   in: join(SERVER_PATH, 'index.js'),
   out: 'index',

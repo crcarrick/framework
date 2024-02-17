@@ -1,9 +1,9 @@
 {
-  "name": "framework-repo",
+  "name": "metaframework-repo",
   "private": true,
   "version": "0.0.0",
   "description": "Mediocre metaframework clone",
-  "repository": "https://github.com/crcarrick/framework.git",
+  "repository": "https://github.com/crcarrick/metaframework.git",
   "author": {
     "name": "Chris Carrick",
     "email": "chris@crccarrick.dev"

@@ -62,7 +62,7 @@ function addLayoutsToPage({ route, page }: Page, manifest: PageManifest) {
   }
 }
 
-const PAGE_REGEX = /.*\.framework\/server\/pages(\/.*)/
+const PAGE_REGEX = /.*\.metaframework\/server\/pages(\/.*)/
 
 export function extractPageManifest({ outputs = {} }: Metafile) {
   const manifest = Object.entries(outputs).reduce<PageManifest>(

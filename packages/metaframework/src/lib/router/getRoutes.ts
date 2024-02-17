@@ -15,7 +15,7 @@ export async function getRoutes(config: Config) {
   }
 
   const manifest = (await import(
-    join(cwd(), '.framework', 'page-manifest.json'),
+    join(cwd(), '.metaframework', 'page-manifest.json'),
     {
       with: { type: 'json' },
     }

@@ -1,8 +1,8 @@
 {
-  "name": "@framework/example",
+  "name": "metaframework-example",
   "private": true,
   "version": "0.0.0",
-  "description": "Example site built with framework",
+  "description": "Example site built with metaframework",
   "author": {
     "name": "Chris Carrick",
     "email": "chris@crccarrick.dev"
@@ -12,13 +12,13 @@
   },
   "type": "module",
   "scripts": {
-    "dev": "framework dev",
-    "build": "framework build",
-    "debug": "framework debug",
-    "start": "framework start"
+    "dev": "metaframework dev",
+    "build": "metaframework build",
+    "debug": "metaframework debug",
+    "start": "metaframework start"
   },
   "dependencies": {
-    "framework": "workspace:*",
+    "metaframework": "workspace:*",
     "react": "0.0.0-experimental-2cd19ed1d-20240207",
     "react-dom": "0.0.0-experimental-2cd19ed1d-20240207"
   },

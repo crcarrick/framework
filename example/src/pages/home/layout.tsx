@@ -1,11 +1,11 @@
-import type { Metadata } from 'framework'
+import type { Metadata } from 'metaframework'
 
 export const metadata: Metadata = {
   title: 'Home Page',
   description: 'The home page of our example app.',
   applicationName: 'Example App',
-  generator: 'Framework',
-  keywords: ['Framework', 'Example App'],
+  generator: 'Metaframework',
+  keywords: ['Metaframework', 'Example App'],
   referrer: 'origin-when-cross-origin',
   creator: 'Chris Carrick',
   publisher: 'Chris Carrick',

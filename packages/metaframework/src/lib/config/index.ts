@@ -27,13 +27,13 @@ function isJsConfig(obj: unknown): obj is Config | (() => Config) {
 
 async function findConfig(): Promise<string> {
   const root = await findUp([
-    'framework.config.js',
-    'framework.config.cjs',
-    'framework.config.json',
+    'metaframework.config.js',
+    'metaframework.config.cjs',
+    'metaframework.config.json',
   ])
 
   if (!root) {
-    throw new Error('Could not find a framework config')
+    throw new Error('Could not find a metaframework config')
   }
 
   return root
@@ -61,5 +61,5 @@ export async function loadConfig(): Promise<Config> {
     })
   }
 
-  throw new Error('Invalid framework config')
+  throw new Error('Invalid metaframework config')
 }

@@ -69,7 +69,7 @@ module.exports = {
     'react/jsx-uses-react': 'off',
   },
   settings: {
-    'import/internal-regex': '^@framework/',
+    'import/internal-regex': '^metaframework/',
     'import/parsers': {
       '@typescript/eslint-parser': ['.ts', '.tsx'],
     },

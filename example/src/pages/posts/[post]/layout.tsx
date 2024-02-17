@@ -1,4 +1,4 @@
-import { GenerateMetadata } from 'framework'
+import { GenerateMetadata } from 'metaframework'
 
 interface Params {
   post: string

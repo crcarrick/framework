@@ -25,20 +25,20 @@ async function devServer({ debug }: DevServerOptions = {}) {
 
   const files = [
     'src/**/*',
-    'framework.config.js',
-    'framework.config.cjs',
-    'framework.config.json',
+    'metaframework.config.js',
+    'metaframework.config.cjs',
+    'metaframework.config.json',
   ]
   // FIXME: little hack to help me while i'm developing this thing
   if (debug) {
-    files.push('.framework/server/index.js')
-    files.push('.framework/public/bootstrap.js')
+    files.push('.metaframework/server/index.js')
+    files.push('.metaframework/public/bootstrap.js')
   }
 
   const server = nodemon({
     ext: 'js,ts,jsx,tsx',
     delay: debug ? 2000 : 100,
-    script: join('.framework', 'server', 'index.js'),
+    script: join('.metaframework', 'server', 'index.js'),
     ignore: ['node_modules'],
     nodeArgs: ['--no-warnings'],
     watch: files,
@@ -67,14 +67,14 @@ async function devServer({ debug }: DevServerOptions = {}) {
 // TODO: how would we run this in a production ready way?
 async function startServer() {
   await build()
-  await import(join(process.cwd(), '.framework', 'server', 'index.js'))
+  await import(join(process.cwd(), '.metaframework', 'server', 'index.js'))
 }
 
 async function main() {
   const args = process.argv.slice(2)
 
   if (args.length === 0) {
-    console.error('Usage: framework <command> [options]')
+    console.error('Usage: metaframework <command> [options]')
     process.exit(1)
   }
 

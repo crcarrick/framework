@@ -12,11 +12,10 @@
     "sourceMap": true,
     "strict": true,
     "target": "esnext",
-    "types": ["react/experimental"],
   },
   "references": [
     {
-      "path": "./packages/framework",
+      "path": "./packages/metaframework",
     },
   ],
 }

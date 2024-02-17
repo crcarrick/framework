@@ -1,5 +1,5 @@
 {
-  "name": "framework",
+  "name": "metaframework",
   "version": "0.0.1",
   "description": "Mediocre metaframework clone",
   "author": {
@@ -7,7 +7,7 @@
     "email": "chris@crcarrick.dev"
   },
   "bin": {
-    "framework": "./cli.js"
+    "metaframework": "./cli.js"
   },
   "exports": {
     ".": {

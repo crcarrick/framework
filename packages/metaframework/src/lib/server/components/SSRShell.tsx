@@ -10,7 +10,7 @@ interface SSRShellProps {
 }
 
 export function SSRShell({ children, metadata }: SSRShellProps) {
-  const title = metadata.title ?? 'framework'
+  const title = metadata.title ?? 'metaframework'
   const metaTags = createMetaTags(metadata)
   const linkTags = createLinkTags(metadata)
 

@@ -18,7 +18,7 @@ export async function runServer() {
   const routes = await getRoutes(config)
 
   app.use(compression())
-  app.use('/public', express.static(join(cwd(), '.framework', 'public')))
+  app.use('/public', express.static(join(cwd(), '.metaframework', 'public')))
 
   Object.values(routes).forEach((route) => {
     app.get(route.match, (req, res) => {
