@@ -54,6 +54,7 @@ module.exports = {
         extendDefaults: true,
       },
     ],
+    '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/semi': 'off',
     '@typescript-eslint/no-unused-vars': [
       'error',

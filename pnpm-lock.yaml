@@ -129,6 +129,9 @@ importers:
       react-dom:
         specifier: 0.0.0-experimental-2cd19ed1d-20240207
         version: 0.0.0-experimental-2cd19ed1d-20240207(react@0.0.0-experimental-2cd19ed1d-20240207)
+      ts-toolbelt:
+        specifier: ^9.6.0
+        version: 9.6.0
       typescript:
         specifier: ^5.3.3
         version: 5.3.3
@@ -3033,6 +3036,10 @@ packages:
       typescript: '>=4.2.0'
     dependencies:
       typescript: 5.3.3
+    dev: true
+
+  /ts-toolbelt@9.6.0:
+    resolution: {integrity: sha512-nsZd8ZeNUzukXPlJmTBwUAuABDe/9qtVDelJeT/qW0ow3ZS3BsQJtNkan1802aM9Uf68/Y8ljw86Hu0h5IUW3w==}
     dev: true
 
   /tsconfig-paths@3.15.0:
