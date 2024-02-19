@@ -28,6 +28,7 @@ module.exports = {
   ],
   rules: {
     semi: 'off',
+    'no-unused-vars': 'off',
     '@eslint-community/eslint-comments/no-unused-disable': 'error',
     'import/order': [
       'error',

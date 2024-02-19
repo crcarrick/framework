@@ -1,7 +1,8 @@
-import { createRequire } from 'node:module'
 import { parse } from 'node:path'
 
 import { findUp } from 'find-up'
+
+import type { DefaultImport } from '../../types.js'
 
 export interface Config {
   port: number
@@ -12,6 +13,11 @@ const defaultConfig: Config = {
   port: 3000,
   routing: 'filesystem',
 }
+
+type ConfigExt = '.js' | '.cjs' | '.json'
+type ImportedConfig<T extends ConfigExt> = T extends '.json'
+  ? Config
+  : Config | (() => Config)
 
 function isConfig(obj: unknown): obj is Config {
   return (
@@ -39,27 +45,54 @@ async function findConfig(): Promise<string> {
   return root
 }
 
-const require = createRequire(import.meta.url)
+async function importConfig<T extends ConfigExt>(
+  path: string,
+  ext: T,
+): Promise<ImportedConfig<T>>
+async function importConfig(
+  path: string,
+  ext: ConfigExt,
+): Promise<ImportedConfig<typeof ext>> {
+  if (ext === '.json') {
+    const config = (await import(path, { with: { type: 'json' } })) as unknown
+
+    if (!isConfig(config)) {
+      throw new Error('Invalid metaframework config')
+    }
+
+    return config
+  }
+
+  const config = ((await import(path)) as DefaultImport<unknown>).default
+
+  if (!isJsConfig(config)) {
+    throw new Error('Invalid metaframework config')
+  }
+
+  return config
+}
 
 export async function loadConfig(): Promise<Config> {
   const root = await findConfig()
-  const parsed = parse(root)
-  const config = require(root) as Config | (() => Config)
+  const { ext } = parse(root)
 
-  if (parsed.ext === '.json' && isConfig(config)) {
+  if (ext !== '.js' && ext !== '.cjs' && ext !== '.json') {
+    throw new Error('Metaframework config must be a .js, .cjs, or .json file')
+  }
+
+  if (ext === '.json') {
+    const config = await importConfig(root, ext)
+
     return Promise.resolve({
       ...defaultConfig,
       ...config,
     })
   }
 
-  if (parsed.ext.match(/\.c?js$/) && isJsConfig(config)) {
-    const resolved = typeof config === 'function' ? config() : config
-    return Promise.resolve({
-      ...defaultConfig,
-      ...resolved,
-    })
-  }
-
-  throw new Error('Invalid metaframework config')
+  const config = await importConfig(root, ext)
+  const resolved = typeof config === 'function' ? config() : config
+  return Promise.resolve({
+    ...defaultConfig,
+    ...resolved,
+  })
 }
