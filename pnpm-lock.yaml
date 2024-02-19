@@ -8,6 +8,12 @@ importers:
 
   .:
     devDependencies:
+      '@crcarrick/eslint-config':
+        specifier: ^1.0.1
+        version: 1.0.1(@eslint-community/eslint-plugin-eslint-comments@4.1.0)(@typescript-eslint/eslint-plugin@6.20.0)(@typescript-eslint/parser@6.20.0)(eslint-plugin-import@2.29.1)(eslint-plugin-react-hooks@4.6.0)(eslint-plugin-react@7.33.2)(eslint@8.56.0)
+      '@crcarrick/tsconfig':
+        specifier: ^1.0.0
+        version: 1.0.0(typescript@5.3.3)
       '@eslint-community/eslint-plugin-eslint-comments':
         specifier: ^4.1.0
         version: 4.1.0(eslint@8.56.0)
@@ -141,6 +147,34 @@ packages:
   /@aashutoshrathi/word-wrap@1.2.6:
     resolution: {integrity: sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==}
     engines: {node: '>=0.10.0'}
+    dev: true
+
+  /@crcarrick/eslint-config@1.0.1(@eslint-community/eslint-plugin-eslint-comments@4.1.0)(@typescript-eslint/eslint-plugin@6.20.0)(@typescript-eslint/parser@6.20.0)(eslint-plugin-import@2.29.1)(eslint-plugin-react-hooks@4.6.0)(eslint-plugin-react@7.33.2)(eslint@8.56.0):
+    resolution: {integrity: sha512-JU/gkF9Qv6bUGkmlEMcTtSVQjok5H8AqbXXxYpZ55zUZ8xax23hInYJvoWaR439Y0BhsAVqMLp05sEejUWChtA==}
+    peerDependencies:
+      '@eslint-community/eslint-plugin-eslint-comments': ^4.1.0
+      '@typescript-eslint/eslint-plugin': ^6.20.0
+      '@typescript-eslint/parser': ^6.20.0
+      eslint: ^8.56.0
+      eslint-plugin-import: ^2.29.1
+      eslint-plugin-react: ^7.33.2
+      eslint-plugin-react-hooks: ^4.6.0
+    dependencies:
+      '@eslint-community/eslint-plugin-eslint-comments': 4.1.0(eslint@8.56.0)
+      '@typescript-eslint/eslint-plugin': 6.20.0(@typescript-eslint/parser@6.20.0)(eslint@8.56.0)(typescript@5.3.3)
+      '@typescript-eslint/parser': 6.20.0(eslint@8.56.0)(typescript@5.3.3)
+      eslint: 8.56.0
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@6.20.0)(eslint@8.56.0)
+      eslint-plugin-react: 7.33.2(eslint@8.56.0)
+      eslint-plugin-react-hooks: 4.6.0(eslint@8.56.0)
+    dev: true
+
+  /@crcarrick/tsconfig@1.0.0(typescript@5.3.3):
+    resolution: {integrity: sha512-2s/COhZEA7zMTac1by+s0MTMVjvhdO1CCcllJPj7MumvfdknM2vQJg4jcMQWYi14YnYC2hwfZS77bIacMpcHPA==}
+    peerDependencies:
+      typescript: ^5.3.3
+    dependencies:
+      typescript: 5.3.3
     dev: true
 
   /@esbuild/aix-ppc64@0.20.0:
